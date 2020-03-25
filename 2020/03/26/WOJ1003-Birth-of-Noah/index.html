@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Carrie">
+
+
+    <meta name="subtitle" content="再相逢，希望我们都在更高处。">
+
+
+    <meta name="description" content="菜鸡的自我修养">
+
+
+    <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
+
+
+<title>WOJ1003-Birth of Noah | Carrie&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Carrie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Carrie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">WOJ1003-Birth of Noah</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Carrie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">三月 26, 2020&nbsp;&nbsp;0:49:53</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/dailynote/">dailynote</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><a href="https://blog.csdn.net/LXQ1071717521/article/details/77675997" target="_blank" rel="noopener">WOJ1003-Birth of Noah</a><br>题目给了一个明确的家族数，很容易想到用C语言的结构体数组来表示，信息很明确，这道题卡在我的是，如何处理输入，在&lt;stdio.h&gt;中定义的EOF可用来判断输入结束，因为其值为-1，超过了0~127的ASCII码值，这样我写出了第一份代码：<br>‘’’<br>#include&lt;stdio.h&gt;<br>struct peoples{<br>    char name[12] ;<br>    int age;<br>    int gen;<br>};</p>
+<p>int main() {</p>
+<pre><code>struct peoples family[13]= { 
+    { &quot;Adam&quot;,930,1 },
+    {&quot;Seth&quot;,912,2 },
+    {&quot;Enosh&quot;, 905, 3 },
+    {&quot;Kenan&quot;,910,4},
+    {&quot;Mahalabel&quot;,962,5},
+    {&quot;Jared&quot;,962,6},
+    {&quot;Enoch&quot;,365,7},
+    {&quot;Methuselah&quot;,969,8},
+    {&quot;Lamech&quot;,777,9},
+    {&quot;Noah&quot;,NULL,10},
+    {&quot;Shem&quot;,NULL,11},
+    {&quot;Ham&quot;,NULL,11},
+    {&quot;Japheth&quot;,NULL,11}
+};
+
+char name0[12];
+char name1[12];
+int j;
+int p1=0, p2=0;
+while(scanf(&quot;%s %s&quot;,&amp;name0,&amp;name1)!=EOF){
+
+        for ( j = 0;j &lt; 13; j++) {
+            if (name0 == family[j].name)
+            {
+                p1 = j;
+                break;
+            }
+        }
+        for ( j = 0;j &lt; 13; j++) {
+            if (name1== family[j].name)
+            {
+                p2 = j;
+                break;
+            }
+        }
+
+        if(family[p1].gen==NULL||family[p2].gen==NULL)
+            printf(&quot;No enough information\n&quot;);
+        else if(family[p1].gen&lt;family[p2].gen)
+            printf(&quot;Yes\n&quot;);
+        else
+            printf(&quot;No\n&quot;);
+
+        if(!family[p1].age || !family[p2].age)
+        {
+            printf(&quot;Not enough infomation\n&quot;);
+            continue;
+        }
+        else if(family[p1].age &gt; family[p2].age)
+        {
+                printf(&quot;Yes\n&quot;);
+                continue;
+        }
+        else
+                {
+                    printf(&quot;No\n&quot;);
+                    continue;
+                }
+
+}
+
+return 0;</code></pre><p>}<br>‘’’</p>
+<p>但是<strong>结果错误</strong>，问题在于debug的时候发现，比如说family[0]与第一次循环输入的”Adam”应该相同，但是我们忽略了接收”Adam”时从缓冲区中读取了12个字节的内容，也就是说name0的内容是“Adam\0？？？？？？？”，而family[0]应该是“Adam00000000”,这时候通过“==”来判定是不合适的，所以应该改用strcmp，因为strcmp在遇到“\0”就停止了（另一种停止的情况是在比较中第一次发现不相等就退出）。</p>
+<p>当然还有一个遗留问题，我的代码结果其实是对的，但是测试还是没有通过，是因为一个很奇怪的输入问题，scanf并没有读取到把第二行送入的标识，所以第一行因为换行符得到执行，但第二行却得不到执行，需要额外输入一个回车！疑惑！！！！</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Carrie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/03/26/WOJ1003-Birth-of-Noah/">https://github.com/Carrieono/Carrieono.github.io/2020/03/26/WOJ1003-Birth-of-Noah/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C-language/"># C-language</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2020/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/">安卓工厂重置的安全性分析</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Carrie | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
