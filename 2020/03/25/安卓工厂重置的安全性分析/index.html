@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Carrie">
+
+
+    <meta name="subtitle" content="再相逢，希望我们都在更高处。">
+
+
+    <meta name="description" content="菜鸡的自我修养">
+
+
+    <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
+
+
+<title>安卓工厂重置的安全性分析 | Carrie&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Carrie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Carrie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">安卓工厂重置的安全性分析</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Carrie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">三月 25, 2020&nbsp;&nbsp;20:50:49</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/">移动安全</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="安卓工厂重置的安全性分析"><a href="#安卓工厂重置的安全性分析" class="headerlink" title="安卓工厂重置的安全性分析"></a>安卓工厂重置的安全性分析</h1><p>作者: Laurent Simon,Ross Anderson</p>
+<p>单位：University of Cambridge，University of Cambridge</p>
+<p>整理：Carrie</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>​   由于2018年预计有数亿台设备贸易，智能手机清理漏洞可能导致严重问题。 贸易新闻早就对安卓工厂重置的有效性提出了质疑，但是本篇论文受此对事件作出综合研究。我们从5个供应商调查了版本号从2.3到4.3的21款安卓智能手机工厂重置的执行。我们估计有5亿的设备可能无法正确地清理它们证书和敏感数据所在的数据分区， 无法对存储多媒体文件的内部SD卡进行适当清理的数据可能高达6.3MB。调查发现我们可以在所有运行有缺陷的工厂重置功能的设备上恢复谷歌证书。而全盘加密应该能够在一定程度上减轻这个影响，但是我们发现了一个有缺陷的工厂重置遗漏了足够的数据暴露加密密钥。我们给谷歌和其他运营商减轻这种缺陷带来的影响提出了实用意见。</p>
+<h3 id="I-介绍"><a href="#I-介绍" class="headerlink" title="I. 介绍"></a>I. 介绍</h3><p>​   随着二手手机的广泛使用，数据泄露威胁持续增长。现如今人们更加乐意高价购买高端产品，如果他们知道他们能够随后能以更便宜的价格购买，一个健康的二手手机市场的重要性对于运营商不言而喻。所以数据清除问题也会影响二手市场的成长。如果消费者害怕泄露数据，他们可能选择不再售卖产品，选择更少的新兴产品；或者保持产品的更新，但是不采用银行或医疗应用等敏感服务，因此会减慢更新。最后， 根据消费者保护法或数据保护法，电话销售商可能要承担责任。为了给设备清理，建议用户使用内置的设备管理里的工厂重置功能。 以前的报告[1]中偶尔会对Android中这种实现的有效性提出质疑，声称数据有时可以被恢复。这份论文提供了针对此问题的第一个综合调查。 它(i)量化有缺陷的重置功能使用后留下的数据量，(ii)提供受影响设备(版本、供应商)的详细分析，(iii)揭示缺陷背后的驱动程序，以及(iv)  讨论减轻这些问题的实际解决方案(第三节和第六节)。 具体来说，工厂重置允许攻击者访问用户的谷歌帐户及其由谷歌服务备份的相关数据，比如 联系人和WiFi证书(第四部分)。我们的研究揭示了5个关键的缺陷:(i)Android缺乏对正确删除v2.3设备中数据分区的支持；(ii)供应商推送给有缺陷设备的升级不完整;(iii)较新的设备(如v4.[1,2,3])缺乏驱动程序支持，无法正确删除;  (iv)所有操作系统版本缺乏Android系统对正确删除内外部SD卡的支持;(v)为了缓解这些问题设计的直到Android v4.4（KitKat）全磁盘加密的脆弱性。</p>
+<p>​   总之，我们的贡献如下:</p>
+<ul>
+<li><p>我们首次全面研究Android工厂重置，通过研究来自5个供应商的21个Android智能手机运行的Android版本从2.3到v4.3。</p>
+</li>
+<li><p>我们强调关键的缺陷，比如Android操作系统和/或供应商提供的安全删除驱动程序缺乏支持。这些问题可能会影响设备，甚至在升级后。</p>
+</li>
+<li><p>我们讨论了谷歌和供应商在未来减轻这些风险的实际改进。</p>
+</li>
+</ul>
+<h3 id="II-技术背景"><a href="#II-技术背景" class="headerlink" title="II.技术背景"></a>II.技术背景</h3><h4 id="A-闪盘flash和文件系统file-system"><a href="#A-闪盘flash和文件系统file-system" class="headerlink" title="A. 闪盘flash和文件系统file system"></a>A. 闪盘flash和文件系统file system</h4><p>​   智能手机使用flash进行非易失性存储，因为它速度快、价格便宜、体积小。闪存通常以页和块的形式排列。CPU可以读写一个页面(通常是512+16到4096+128数据+元数据字节)，但是只能擦除一个从32到128页的块。每个块包括数据，越界数据（OOB）或者用于坏块处理的元数据，纠错代码（ECC）和文件系统统计。 在写入之前，块必须被擦除;然而，闪存芯片只支持有限数量的程序擦除周期，因此使用磨损平衡算法将擦除和写操作均匀地分布在所有块上。值得一提的是，闪存通常是超额供应的，也就是说，一个芯片有比它让操作系统了解的更多的内部空间，这是因为它有坏块和进一步减少磨损的预期。</p>
+<p>​   早期的Android设备(比如Froyo, Android v2.2)使用可识别闪存的文件系统yaffs2处理磨损水准测量和误差校正。因为姜饼(v2.3)设备通常带有一个嵌入式多媒体卡(eMMC)与应用在硬件里的专有的磨损平衡算法。eMMC不允许操作系统访问到原始的flash，但暴露一个块状的设备，在上面操作系统会设置一个像ext4一样的块文件系统。块只有给操作系统一个内存的逻辑视图。在内部,每一块通过eMMC控制器映射到flash上相应的物理块。当逻辑块N中的数据由操作系统更新时(图1，右)，相应的物理块通常会被添加到“要擦除”列表中，然后重新映射到一个“干净的”物理块M，从而使原始块内容保持不变。因此,要实现安全删除，eMMC标准定义特定的命令必须被使用去令从内存中删除物理数据。</p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/a.png" class>
+
+
+<h4 id="B-安全删除等级"><a href="#B-安全删除等级" class="headerlink" title="B.安全删除等级"></a>B.安全删除等级</h4><p>​    删除文件时，操作系统通常只从表中删除其名称，而不是删除其内容。在闪存上，由于没有进行数据更新，情况会变得更糟，即数据被复制到一个新的块中以保持性能，减少擦除块数并降低磨损速度。因此，有各种各样的建议、指导方针和标准来净化数据。根据考虑的[2]威胁模型，以下数据清理级别是相关的。 </p>
+<p>​    最高水平的清除是模拟1清除，这降低了模拟信号的编码信息，所以它的重建是不可能的，即使是最先进的传感设备和专业知识。例如，NIST的媒体清除指导有一个“彻底清除”等级符合模拟清除。</p>
+<p>​    第二层是数字1清除。经过数字清除的存储中的数据不能通过任何数字手段恢复，包括绕过或破坏设备的控制程序或固件，或通过未注册的驱动器命令。可能需要不受限制地物理访问闪存芯片和制造商的数据表，但这些对典型的智能手机来说是不可用的。 </p>
+<p>​    第三个层次是逻辑清理。逻辑清理存储中的数据无法通过标准的硬件接口(如标准eMMC命令)恢复。例如，这对应于NIST 800-88的“清除”级别。对于手机和PDA, NIST 800-88建议“清除”它们，方法是手动删除数据，然后进行工厂重置。 </p>
+<p>​   在这项研究中，我们考虑了廉价的数据恢复攻击，它既不需要昂贵的设备来物理地从芯片中提取数据，也不需要特定的芯片知识。只有那些无视底层芯片规模的跨设备攻击，如果大规模利用，可能是有利可图的。因此，在本文件的其余部分，由“适当的”或“安全”的清除，我们指的是逻辑除。</p>
+<h4 id="C-Linux-Kernel-Deletion-APIs"><a href="#C-Linux-Kernel-Deletion-APIs" class="headerlink" title="C.Linux Kernel Deletion APIs"></a>C.Linux Kernel Deletion APIs</h4><p>​   特权用户空间程序可以通过Linux内核公开的ioctl()系统调用删除flash块。在raw flash上，ioctl的MEMERASE提供数字清除。在eMMC上有两种可能的选择。第一个是BLKDISCARD，它不提供任何安全性保证。在内部，内核通常通过传递eMMC命令“DISCARD”或“TRIM”到芯片实现BLKDISCARD。它们并不要求eMMC这样做清除块。它们只是表明已经不再需要数据，以便在后台擦除事件期间eMMC可以在必要时擦除它。他们通常是在解除文件链接时使用。第二个ioctl选项是BLKSECDISCARD,提供“安全”删除功能。内核通过eMMC标准许多“安全删除”命令定义之一传递到芯片来清理它。实际使用的eMMC命令取决于芯片的支持。这里有一个“ERASE”用于逻辑清理的命令和诸如此类的命令“SECURE TRIM”、“SECURE ERASE”和“SANITIZE”用于数据清理。</p>
+<h4 id="D-数据分区"><a href="#D-数据分区" class="headerlink" title="D.数据分区"></a>D.数据分区</h4><p>​    Android智能手机共享三个常用的数据存储分区(图2)。第一个是数据分区，通常安装在/data/上，存放应用程序的私有目录。应用程序的私有目录不能被其他应用程序读取或写入，因此它通常用于存储敏感信息，如登录凭证。在拥有小数据分区的老款手机上，也可以在外接的SD卡上安装应用程序;但这通常不是默认的行为。 </p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/b.png" class>
+
+<p>​</p>
+<p>​   存储用户数据的第二个分区是内部分区(初级)SD卡。尽管它的名字，它不是一个SD卡本身，而是一个物理存储在同一芯片上的分区。它通常安装在/sdcard/或/mnt/sdcard/上，应用程序可读/写。用户空间中的文件系统通常是FAT格式或者在用户空间模拟文件系统。在后一种情况下，文件实际存储在数据分区上。内部SD卡主要用于存储相机和麦克风制作的多媒体文件;它通常暴露在一台通过USB接口连接的计算机上海量存储，媒体传输协议(MTP)或图片传输协议(PTP)。</p>
+<p>​    最后一个包含用户数据的分区是可移动的外部SD卡。它提供了与内部SD卡类似的功能，但可以由用户实际插入和删除。如果设备上没有内部SD卡，则外部SD卡成为“主SD卡”;否则它是“副SD卡”。主副SD卡有时被称为“外部存储器”。</p>
+<p>​   一些设备也有硬件密钥存储。支持时，默认帐户主要使用它管理器应用程序。</p>
+<h3 id="III-安卓工厂重置分析"><a href="#III-安卓工厂重置分析" class="headerlink" title="III.安卓工厂重置分析"></a>III.安卓工厂重置分析</h3><h4 id="A-方法论"><a href="#A-方法论" class="headerlink" title="A.方法论"></a>A.方法论</h4><p>​    2014年1月至5月，我们从eBay和英国的手机回收公司购买了二手Android手机，根据可用性随机选择设备。由于该项目可能会暴露个人信息，所以它首先被提交给我们的道德流程审批。在本文的其余部分，我们将“设备”称为唯一对(电话名称、操作系统版本)。 </p>
+<p>​   我们研究了来自5个供应商的26种不同的设备(列表在附件中提供)4运行的Android版本从v2.2 (Froyo)到v4.3 (Jelly Bean)不等。这些Android版本被更频繁地转售，并在今天进行交易。图4显示了我们的样本的Android版本的分布，与2013年6月和2014年3月的活动设备相比，基于谷歌的仪表板报告5。 我们的样本并不代表收购时的操作系统版本发行情况，但与6个月前的2013年6月的全球发行情况类似(从新手机进入二手市场所花的时间可以看出这一点)。 2013年9月，谷歌宣布有10亿台设备被激活6。这代表了姜饼(GB, v2.3.x) 3.4 m，冰淇淋230M，三明治(ICS, v4.0.x)设备和380M果冻豆(JB, v4.[1-3])设备。我们的样品是收购时二手市场的代表。我们使用设备的数量和它们在不同版本之间的分布(在6月13日)按照以下部分，来估计受有缺陷的工厂重置功能影响的设备数量。估计是基于这样的假设，即每台设备占总设备流量的百分比相同。这在实践中是不正确的，这是我们评估的一个局限。</p>
+<p>​      </p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/c.png" class>
+
+
+<p>​    我们测试了每个感兴趣的分区(Section II-D)，方法是用惟一的标识模式覆盖它。然后我们使用工厂重置功能对设备进行了清除，并试图恢复写好的模式。我们调查了供应商建议重新设置工厂7(图3(a) - 90%的供应商推荐)，恢复/引导加载模式(图3(b) - 70%的供应商推荐，如果手机无法启动)。恢复模式和引导加载模式是一种特殊的模式，一个电话可以通过一个硬件密钥的组合启动。感兴趣的读者可以查阅每个步骤的详细信息(模式生成，快速读写，模式恢复)。在剩下的研究中，我们用“工厂重置”和“擦除”来代替。</p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/d.png" class>
+
+
+<h4 id="B-结果和讨论"><a href="#B-结果和讨论" class="headerlink" title="B.结果和讨论"></a>B.结果和讨论</h4><p>​   1） <strong><em>初步结果</em></strong>:我们发现只有当用户选择了设置中的工厂重置的附加存储选项时，才会对外部存储进行清理。 在这种情况下，Android 操作系统首先执行外部存储的清理，然后重新引导进入Recovery/Bootloader模式，其中数据分区和缓存分区(主要包含优化后的分区) 被清理。如果用户工厂使用恢复/引导加载程序重置设备，而不是设置，那么外部存储就不会被清除——下面几段将提供设备之间的细微差别。图5显示了所研究的所有设备的内置清理结果。 </p>
+<p>​   </p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/e.png" class>
+
+
+<p> 2)<strong><em>数据分区的清理</em></strong>:从第二节的D部分可以看出，数据分区存储了来自谷歌和第三方应用程序的敏感信息，例如证书。在运行我们研究的最老版本Android (Froyo, v2.2.x)的设备上，数据分区在逻辑上经过了清理。这些设备使用带有yaffs2文件系统(Section II-A)的原始闪存，如果不首先对分区进行适当的清理，就无法对其进行重新格式化。安卓开源项目(AOSP)8)通过恢复模式(表I)揭示了ioctl的用法MEMERASE命令，这提供了数字消毒和确认的结果图5所示。</p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/f.png" class>
+<pre><code>从Gingerbread开始(≥v2.3.x)，我们遇到的所有设备都使用eMMC(除了一个)，在这种情况下，不需要对分区进行适当的清理就可以重新格式化分区。从图5可以看出，大约90%(≈300M)的Gingerbread (v2.3.x)设备对数据分区的消毒不安全，最多删除几百MB，根据数据分区的大小，约占数据分区的60% ~ 99.9%。 Android开源项目(AOSP)揭示了在恢复模式下使用ioctl的BLKDISCARD命令(表一)，这并没有提供逻辑上的清理，因此确认了图5的结果。在我们的示例中，正确删除数据分区的唯一设备是HTC Wildfire S(姜饼);因为它使用的是yaffs2而不是eMMC。</code></pre><p>​   如表一所示，以下是Android版本(ICS, v4.0.x)在AOSP代码中通过BLKSECDISCARD引入了逻辑清理支持。这与图5中60%(≈140M)的ICS (4.0.x)设备不正确地消毒了数据分区的结果相矛盾。我们的示例中的许多集成电路设备最初都是使用GB (v3 .x)发布的，并升级到ICS (4.0.x)。我们验证了手机二进制文件确实包含来自AOSP的最新代码，即支持逻辑清理。然后，我们将注意力转向更底层的代码，并发现供应商升级可能忽略了必要的设备驱动程序，以便从底层eMMC公开逻辑清理功能。实际上，这意味着ioctl不支持安全命令BLKSECDISCARD，也就是说，它返回errno95(EOPNOTSUPP)。可能eMMC本身不支持安全删除，但我们认为这不太可能，因为2007年的4.2 eMMC标准已经为逻辑清理提供了计算的“ERASE”命令。我们至少在某些手机上找到了支持这一说法的证据:在解锁引导加载程序时在HTC Sensation XE中，数据分区经过了适当的清洁处理，而不是在出厂重置期间。受影响的装置包括三星Galaxy S Plus，S(销量2500万部)11和S2(销量4000万辆11)，以及HTC Sensation XE。只有谷歌Nexus S，在我们的示例中，在收到对ICS的升级后对其数据分区进行了适当的清理。 在进一步升级到Jelly Bean (JB, v4.[1-3])之后，问题可能会持续存在，尽管我们无法确定这一点，因为我们的样本不包含此类设备。 </p>
+<p>​   除了升级问题之外，搭载了更新的Android版本的设备，如ICS (4.0.x)和JB (v4.[1-3])也不是没有问题(图5)。例如，当我们尝试安全删除时，搭载了ICS的LG Optimus L5确实返回了errno EOPNOTSUPP。更有趣的是，摩托罗拉的Razr I搭载JB，没有返回任何错误，但安全删除 果根本没有删除任何块。由于这些驱动问题，图5显示了JB (v4.[1-3])的15%(≈55M)设备对数据分区的清理不当。</p>
+<p>​   3）<strong><em>主SD卡的清理</em></strong>： 回想一下，第II-D节:主SD卡对应于内部SD卡或物理可移动SD卡(如果没有前者)。它主要托管用摄像头制作的多媒体文件，可能还有第三方应用程序。</p>
+<p>​   我们发现没有Froyo (2.2.x版本)和Gingerbread (GB, 2.3.x版本)设备对他们的pri- mary SD卡进行逻辑清理。这代表了超过3.4亿台设备。AOSP代码显示，在这些版本中，Android仅通过调用Fat::format()来格式化主SD卡(表一)，验证了图5的结果。在实践中，最多有几十MB在逻辑上经过了清理。</p>
+<p>​   如表一所示，AOSP在下列Android版本(ICS, 4.0.x)主SD卡的清理中没有在发现任何代码更改。然而，图5显示了大约40%(≈90M)的ICS设备对其主SD卡进行了适当的清理(即≈140M的设备没有清理)。你可能会得出结论，供应商已经定制了AOSP代码，并为主SD卡添加了安全删除支持，但这是错误的。这个逻辑清理在于以下几个原因(i)这些手机上的主SD卡对应于内部SD卡，(ii)这些设备使用物理存储在数据分区上的仿真SD卡(ii - d节) (iii)根据AOSP对数据分区进行适当的清理，从而由主SD卡“继承”。只有满足了这三个幸运的条件，我们才能确信主SD卡是经过逻辑清理的。 </p>
+<p>​   下面的Android版本(JB, v4.[1-3])通过ioctl的BLDISCARD命令添加了不安全的删除。这就证实了为什么40%(≈150M)的设备仍然无法对其主设备(内部或外部)SD卡进行逻辑清理。在撰写本文时，我们还不知道主SD卡的处理有任何变化，因此我们希望所有其他的Android版本都能保持这样的结果。</p>
+<p>4）<strong><em>副SD卡的消毒</em></strong>:在我们的样本中，没有任何设备对二级(外部)SD卡进行了适当的消毒。我们发现，Android一般不会试图去清理它(表I)，这解释了结果图5所示。</p>
+<p>5）<strong><em>供应商定制的不一致性</em></strong>:除了已经强调的版本和模型之间的各种差异外，我们还发现了其他供应商的问题。例如，我们只提到了工厂重置在设置提供了一个选项来清理主要SD卡(第三- b1节)。因此，有人可能会建议用户使用设置而不是清理工具来清理设备。不幸的是，供应商定制有时会使恢复数据变得更加可靠。例如，我们样本中的两款HTC One系列手机在恢复(与AOSP相反)阶段，对它们的主要功能进行了适当的清理(内部)SD卡，但不是在设置(正如我们期望从AOSP源代码)。这一结果很可能适用于许多其他HTC系列的设备。这也违反了HTC的指导方针:在其网站上12它建议用户首先尝试设置，只有在“你无法打开HTC One[X]或访问设置”的情况下才可以恢复打开”。HTC发布了一份免责声明:“出厂重置可能不会永久删除手机中的所有数据，包括个人信息。”</p>
+<p>6）<strong><em>eMMC逻辑消毒的实现</em></strong>:通常来说，我们发现在我们的样本设备会通过ioctl命令逻辑清理所有字节请求，除了一个电话:谷歌Nexus 4。它有一个6189744128B数据分区，完全由文件系统使用。最后的16KB没有被清除，并且在工厂重置后大约有20%的时间可以完全恢复。我们的假设是，这可能是eMMC本身(或其相应的驱动程序)中的一个bug，因为我们在其他设备中没有看到类似的问题。 </p>
+<p>7）<strong><em>要清理的逻辑块的数量</em></strong>:如果使用不安全的清理命令“DISCARD”，eMMC将对该块应用“不在乎”策略。根据该标准，“依赖于设备的主机可以部分或完全访问原始数据”。这进一步意味着数据最初暴露在位于logical offset LO org的逻辑块中，可以在不同的逻辑偏移处重新映射，如LO重新映射，如图6所示。如果大小为M的文件系统没有填满整个分区，则存在删除块的数据“跨越”的风险<br>文件系统的边界。因此，如果只对文件系统使用的块进行安全清理，([0, M]在我们的例子中)，一些重映射的块(在]M, S]内)可能不会被清除。 我们强调，我们还没有在我们的样本设备中发现这种情况发生的证据。但是，为了减少这种情况发生的可能性，我们建议供应商删除整个分区，而不是只删除文件系统使用的部分。在我们的设备示例中，HTC one系列手机在数据分区的末端留下了几个MB的空间。对整个分区进行清理会更加小心。类似地，AOSP代码当前在创建文件系统和计算工厂重置期间要擦除的大小时，将分区大小截断为4096B的倍数。对整个分区进行清理会更加谨慎。  </p>
+{% asset_img g.png  %}
+
+
+<h3 id="IV-数据恢复实践"><a href="#IV-数据恢复实践" class="headerlink" title="IV. 数据恢复实践"></a>IV. 数据恢复实践</h3><pre><code>我们的目标不是实现新的工具和算法，而是评估其可行性和攻击可扩展性。Android智能手机上的数据通常存储在SQLite数据库和类似文本的文件。</code></pre><p>​   为了提取SQLite文件，我们首先研究了使用Scalpel[4]进行文件雕刻。文件雕刻是利用文件内容和结构的知识来搜索文件的实践，而不是依赖于文件系统元数据13。在实践中，我们发现了数据库文件头及其内容并不总是连续分配的，这可能是由于重复的更新。而且，每个应用程序数据库都有不同的布局，并且记录并不总是连续地位于分区上。因此，用简单的技术解析来自这些片段的数据并不完全可靠。 因此，用简单的技术解析来自这些片段的数据并不完全可靠。因此，我们仅使用SQLite 文件雕刻作为初步步骤。 </p>
+<p>​   我们很快意识到，大多数数据(包括数据库文件)都显示了特定的、不同的格式。例如，已安装的应用程序列表存储在文件中/data/system/package .xml，具有定义良好的结构形式&lt;package name= “ com.mycompany .myapp”代码路径= “ /system/app/ myapp.apk”…&gt;。因此，我们首先使用模式匹配来从III-A部分恢复所有二手手机上的数据，而文件雕刻仅仅用于提取多媒体文件。</p>
+<h4 id="一般结果"><a href="#一般结果" class="headerlink" title="一般结果"></a>一般结果</h4><p>​   我们在有缺陷的工厂重置设备中寻找表II中显示的信息。例如，我们使用模式匹配(列“提取”)在所有设备(列“百分比”)中恢复了一些“对话”(sms、电子邮件和/或消息应用程序中的聊天)。妥协的对话可能被用来勒索(专栏“攻击用法”)。Gmail应用邮件被压缩存储。通过搜索相关的头文件，我们可以找到候选文件，然后解压它们。我们在80%的样本设备中发现了电子邮件，但通常每个设备只有几个(列“注解”)。</p>
+<p><img src="/Carrieono/Carrieono.github/1572314350669.png" alt></p>
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/h.png" class>
+
+
+<h4 id="B-案例研究：劫持谷歌账户"><a href="#B-案例研究：劫持谷歌账户" class="headerlink" title="B.案例研究：劫持谷歌账户"></a>B.案例研究：劫持谷歌账户</h4><p>​   为了提高可用性和用户的参与度，最聪明的手机应用程序用身份验证令牌替换密码用户首次输入密码。在第一个基于身份验证的密码之后，用户可以通过身份验证令牌自动登录;电子邮件可以检索，日历下载通知等，无需用户干预。这些令牌通常存储在数据分区上的非易失性闪存中。帐户<a href="mailto:username@gmail.com">username@gmail.com</a>的一些谷歌令牌，如图7(c)所示。第一个,我们称之为“主令牌”的是以“AFc”开头的长随机字符串。它为大多数谷歌用户提供了访问权限数据。作为测试，我们工厂重置我们自己的手机，然后恢复了主令牌。然后我们创建了相关的文件，重新启动手机。重启之后，手机成功地重新同步联系人、电子邮件等。我们在所有有缺陷工厂的设备中恢复谷歌令牌，主令牌占80%。Facebook等其他应用程序的令牌也可以进行类似的恢复。我们强调我们从未试图使用那些令牌访问任何人的账户。</p>
+<h4 id="潜在攻击者"><a href="#潜在攻击者" class="headerlink" title="潜在攻击者"></a>潜在攻击者</h4><p>​   在eBay等拍卖网站上购买设备的个人可能是攻击者。他们需要花费一段不可忽视的时间来投标和跟进拍卖。另外，他们还要为每台设备支付几美元的佣金和运费。因此，像联系人和电子邮件地址这样的低价值数据似乎并不有利可图。恢复和分析对话和图像(用来勒索受害者)通常需要人工干预或更高级的工具，但浏览器历史记录可能是个例外，其中简单的关键字搜索可能是有效的。勒索用户需要足够多的设备来攻击不安全的数据，也需要足够多的用户来攻击容易上当受骗的目标。但这需要(i)投入大量时间来押注/跟踪项目，以及(ii)购买、加工和转售设备所需的大量物流。因此我们认为只有有足够时间的人才能够以这样的方式赚取外快。 一般来说，像银行凭证这样的高价值数据似乎是最有利可图的犯罪选择。 </p>
+<p>​   实体店的智能手机销售人员可以降低购买设备的成本，因为接收二手设备可能是他们工作的一部分，而且他们可以扫描这些设备，而无需支付拍卖和运输费用。因此，低价值的数据可能对他们有利。由于商人与顾客交谈是很常见的，他们也可以识别出适合敲诈的高于平均价值的目标。攻击者可以将取证软件添加到回收链中，这可能会进一步增加处理的设备数量，以及回收的低价值数据的数量。可以访问公司设备的攻击者也可以访问高价值的数据。另一方面，一旦接到勒索投诉，商店工作人员更容易被警察识别和逮捕。盗贼是另一类攻击者:从被盗的设备中删除数据的可能性小，因此它们不在本文的讨论范围之内。</p>
+<pre><code>虽然通过模式匹配可以恢复大量数据，但这并不一定转化为实际的盈利能力。 </code></pre><h3 id="V-替代清理方法"><a href="#V-替代清理方法" class="headerlink" title="V. 替代清理方法"></a>V. 替代清理方法</h3><p>​   我们认为下述方法可以一定程度上环节有缺陷的工厂重置带来的问题。</p>
+<p>​   用随机字节文件填充感兴趣的分区，希望覆盖所有未分配的空间，可以通过内建工厂重置后的第三方非特权应用程序来实现。这将要求用户在执行工厂重置后手动安装应用程序。否则，存储在文件系统中的谷歌证书(需要安装一个应用程序从谷歌发挥)将不会被删除。这种清理过程还增加了一层额外的不确定性，因为它使用了文件系统而不是直接的flash访问。文件系统也因设备而异，可能是专有的(例如三星RFS)。因此，我们认为这个选项不能可靠地跨设备扩展，因此我们在测试中放弃了这个方法。</p>
+<pre><code>“逐位”覆盖整个分区曾经对我们研究的所有设备和所有分区进行过逻辑清理;因此，这是一个可靠的选择。这种方法的缺点是，它需要特权(即根-见附录)访问设备在实践中。因此，它可能会让普通用户望而却步。 这种方法没有提供彻底的数字清理，因为flash的供应过剩，但是攻击者无法使用Linux内核公开的公共API来恢复数据。此外，即使对于相同设备的实例，过度供应也可能不同，例如使用不同等级的flash。因为我们只关心大规模可扩展的攻击，所以我们没有进一步考虑这个问题，但是具有高安全性要求的公司可能必须考虑这个问题，除非它们能够使用加密，我们将在下面讨论这个问题。 </code></pre><p>​   如果设备支持全磁盘加密(FDE)，那么在设备首次使用时启用它将更适合普通用户。仅在执行工厂重置之前启用FDE(根据谷歌的建议14)可能只会提供逻辑清理，而不会提供彻底的数字清理(纯文本数据仍然可能出现在flash上，因为它的供应过剩)。在ICS (v4.0.x)中引入了FDE，因此它无法帮助大量受影响的GB (v2.3.x)设备。在一款运行GB(版本2.3.x)的HTC手机上，我们发现了一个加密选项，但它把所有数据都留下了。我们假设这是一个供应商定制，可能只加密分配的空间。内部SD卡的FDE不支持所有的电话，也不支持所有的v4.x设备支持数据分区上的FDE，尽管有AOSP的支持。根据经验，只有具有模拟的内部SD卡的设备在受到支持时才会从数据分区继承“加密支持”。在支持的Android版本中，加密密钥使用自salt派生的密钥和用户提供的PIN(或密码)进行加密存储。在AOSP源代码中，这个加密的对象称为“加密页脚”。获得加密页脚访问权的攻击者有足够的信息来离线暴力破解用户的PIN。页脚存储在专用分区或数据分区的最后16KB中——确切位置由供应商通过Android fstab文件的“encryptable=”选项配置。在这两种情况下，我们发现页脚在有缺陷的工厂重置后没有被删除。因此，为了在逻辑上对设备进行加密清理，必须选择一个强密码来阻止离线的暴力破解。由于大多数人只使用4-6位的密码，所以使用暴力破解通常是无关紧要的。 </p>
+<p>​    移动杀毒(MAV)应用程序有一个“远程清除”功能，可以清除丢失或被盗智能手机上的数据。我们建议读者参考Simon和Anderson[5]的一项研究:在发表的时候(2015年)，他们发现远程擦除功能“不是有缺陷的内置功能的替代品” 。</p>
+<h3 id="VI-建议"><a href="#VI-建议" class="headerlink" title="VI. 建议"></a>VI. 建议</h3><p>​   对于供应商，我们的建议是使用支持数字清理的最新eMMC，并在引导加载程序、恢复和Android内核中适当地公开它。更一般地说，以前的研究[6]、[7]和[8]表明，供应商的定制是安全问题的根源之一。因此，我们为AOSP开发人员提供了以下指导方针，希望他们能够减少未来的失误:</p>
+<p>1)使用模拟的主SD卡:这样可以确保只需要在手机上对一个分区进行适当的清理，减少出错的空间。 </p>
+<p>2)删除整个分区，而不仅仅是文件系统显式使用的部分。这减少了由于eMMC磨损平衡块管理和删除实现问题而导致的不幸意外的可能。 </p>
+<p>3)只在一个地方对所有分区进行清理;例如在恢复模式或引导加载程序模式;设置只是让手机重新启动到适当的模式与正确的参数。将相关代码放在一个地方，可以简化测试并减少可能发生的错误。 </p>
+<p>4)通过读取整个分区并检查，暴露一个选项，让恢复模式执行一个清理验证。 </p>
+<p>5)提供测试单元，供供应商在Android遵从套件测试(CST)。如果安全清理失败，测试是否失败，例如，如果不支持或验证步骤4失败。</p>
+<p>6)如果安全的清理措施失败了，不要采取不安全的清理措施——目前的情况就是如此15。</p>
+<p>7)在工厂重置之前，广播意图可以被发送到应用程序，这样它们就可以采取必要的步骤来取消它们的认证——假设可以上网。</p>
+<p>8)将加密元数据存储在数据分区开始处的加密页眉中，而不是存储在加密页脚的末尾。这减少了在有缺陷的清理情况下字典攻击的风险，因为第一个块通常在分区格式化期间被覆盖。将元数据存储在数据分区上还可以确保只有一个分区需要处理，如上所述。</p>
+<h3 id="VII-相关工作"><a href="#VII-相关工作" class="headerlink" title="VII.相关工作"></a>VII.相关工作</h3><p>​   以前的一些研究关注数据恢复和用户的实践。Garfinkel和Shelat[9]研究了二手磁性硬盘的清理情况，发现在2003年没有标准的做法，只有9%的磁盘进行了适当的消毒。Breeuwsma[10]等人讨论了利用低水平成像技术获取数据的问题。卢克和斯托克斯[11]，Billard和Hauri[12]以及Lewis和Kuhn[13，第5章]分别设计了恢复通用文件和flash音频文件的技术。 Walls等人，[14]，[15]设计的算法法医分诊的非清理功能手机和智能手机。</p>
+<p>​    其他研究则着眼于如何安全删除。Wei[2]等人对硬盘驱动器技术和ssd内置的清理命令的可靠性进行了经验评估。他们发现，所有现有的硬盘技术的个人文件都清理失败;这也被弗里曼和伍德沃德[16]报道 。 Gutmann[17]研究了在硬盘上实现模拟清理的技术，并设计了著名的35路覆盖技术。文件清理技术通常依赖于数据加密:然后通过使用内置命令或原始flash访问[18]、[19]、[20]安全地擦除密钥来执行存储清理。 </p>
+<p>​   在安卓系统上，Mahajan[21]等人在5种不同的设备上使用商业软件，从未经清理的安卓智能手机上恢复Viber和Whatsapp聊天。Simon和Anderson[5]研究了移动杀毒软件提供的远程清除功能的可靠性。</p>
+<p>​    据我们所知，这是对Android工厂重置功能的首次全面研究。 </p>
+<h3 id="VIII-总结和展望"><a href="#VIII-总结和展望" class="headerlink" title="VIII. 总结和展望"></a>VIII. 总结和展望</h3><p>​   我们通过研究来自5个运行的供应商的21款 v2.3版本到 v4.3Android智能手机，对Android工厂重置功能进行了首次全面的分析。我们对Android版本的缺陷进行了详细的时间分析。我们跟踪这些问题到(i)Android失败,(ii)不充分的供应商升级，以及(iii)不适当的供应商集成和测试实践。<br>​   未来的研究应该继续调查智能手机内置的清理功能提供的安全级别，看看在这里报道的信息披露之后，情况是否有所改善。它还可以调查这些机构提供的安全级别，即它们是否提供了数字清理。</p>
+<h3 id="IX-致谢"><a href="#IX-致谢" class="headerlink" title="IX. 致谢"></a>IX. 致谢</h3><pre><code>作者感谢匿名评论者提出的有价值的建议和评论。这项工作得到了三星电子研究所(SERI)的支持[资助号RG67002]。 </code></pre><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1] R. Schwamm and N. C. Rowe, “Effects of the factory reset on mobile devices,” in The Journal of Digital Forensics, Security and Law (JDFSL), 2014.</p>
+<p>[2] M. Y. C. Wei, L. M. Grupp, F. E. Spada, and S. Swanson, “Reliably erasing data from ﬂash-based solid state drives.,” in FAST, vol. 11, pp. 8–8, 2011.</p>
+<p>[3] “Photorec.” <a href="http://www.cgsecurity.org/wiki/PhotoRec" target="_blank" rel="noopener">http://www.cgsecurity.org/wiki/PhotoRec</a>.</p>
+<p>[4] G. G. Richard III and V. Roussev, “Scalpel: A frugal, high performance ﬁle carver.,” in DFRWS, 2005.</p>
+<p>[5] L. Simon and R. Anderson, “Security analysis of consumer-grade anti-theft solutions provided by android mobile anti-virus apps,” 4th Mobile Security Technologies Workshop (MoST), 2015.</p>
+<p>[6] A. Pereira, M. Correia, and P. Brandao, “Usb connection vulnerabilities on android smartphones: Default and vendors customizations,” in Communications and Multimedia Security, pp. 19–32, Springer, 2014.</p>
+<p>[7] X. Zhou, Y. Lee, N. Zhang, M. Naveed, and X. Wang, “The peril of ragmentation: Security hazards in android device driver customizations,” in IEEE Symposium on Security and Privacy, 2014.</p>
+<p>[8] L. Wu, M. Grace, Y. Zhou, C. Wu, and X. Jiang, “The impact of vendor customizations on android security,” in Proceedings of the 2013 ACM SIGSAC conference on Computer &amp; communications security, pp. 623–634, ACM, 2013.</p>
+<p>[9] S. L. Garﬁnkel and A. Shelat, “Remembrance of data passed: A study of disk sanitization practices,” IEEE Security &amp; Privacy, vol. 1, no. 1,pp. 17–27, 2003.</p>
+<p>[10] M. Breeuwsma, M. De Jongh, C. Klaver, R. Van Der Knijff, and M. Roeloffs, “Forensic data recovery from ﬂash memory,” Small Scale Digital Device Forensics Journal, vol. 1, no. 1, pp. 1–17, 2007.</p>
+<p>[11] J. Luck and M. Stokes, “An integrated approach to recovering deleted ﬁles from nand ﬂash data,” Small Scale Digital Device Forensics Journal, vol. 2, no. 1, pp. 1941–6164, 2008.</p>
+<p>[12] D. Billard and R. Hauri, “Making sense of unstructured ﬂash-memory dumps,” in Proceedings of the 2010 ACM Symposium on Applied Computing, pp. 1579–1583, ACM, 2010.</p>
+<p>[13] A. B. Lewis, “Reconstructing compressed photo and video data,”Tech. Rep. UCAM-CL-TR-813, University of Cambridge, Computer Laboratory, Feb 2012.</p>
+<p>[14] R. J. Walls, E. Learned-Miller, and B. N. Levine, “Forensic Triage for Mobile Phones with DEC0DE,” in Proc. USENIX Security Symposium, Aug 2011.</p>
+<p>[15] S. Varma, R. J. Walls, B. Lynn, and B. N. Levine, “Efﬁcient Smart Phone Forensics Based on Relevance Feedback,” in Proc. ACM Work shop on Security and Privacy in Smartphones and Mobile Devices,Nov 2014.</p>
+<p>[16] M. Freeman and A. Woodward, “Secure state deletion: Testing the efﬁcacy and integrity of secure deletion tools on solid state drives,”in Australian Digital Forensics Conference, p. 65, 2009.</p>
+<p>[17] P. Gutmann, “Secure deletion of data from magnetic and solid-statememory,” in Proceedings of the Sixth USENIX Security Symposium,San Jose, CA, vol. 14, 1996.</p>
+<p>[18] J. Lee, J. Heo, Y. Cho, J. Hong, and S. Y. Shin, “Secure deletion for nand ﬂash ﬁle system,” in Proceedings of the 2008 ACM symposium on Applied computing, pp. 1710–1714, ACM, 2008</p>
+<p>19] B. Lee, K. Son, D. Won, and S. Kim, “Secure data deletion for usb ﬂash memory,” J. Inf. Sci. Eng., vol. 27, no. 3, pp. 933–952, 2011.</p>
+<p>[20] J. Reardon, S. Capkun, and D. A. Basin, “Data node encrypted ﬁle system: Efﬁcient secure deletion for ﬂash memory,” in USENIX Security Symposium, pp. 333–348, 2012.</p>
+<p>[21] A. Mahajan, M. Dahiya, and H. Sanghvi, “Forensic analysis of instant messenger applications on android devices,” arXiv preprint arXiv:1304.4915, 2013.</p>
+<p>[22] T. Vidas, C. Zhang, and N. Christin, “Toward a general collection methodology for android devices,” Digit. Investig., vol. 8, pp. S14–S24, Aug. 2011.</p>
+<h3 id="X-附录"><a href="#X-附录" class="headerlink" title="X. 附录"></a>X. 附录</h3><h4 id="设备列表"><a href="#设备列表" class="headerlink" title="设备列表"></a>设备列表</h4><p>以下是我们在第三节展示结果的设备：</p>
+<p><strong>Froyo (v2.2.x)</strong>: HTC Nexus One, Motorola Defy.</p>
+<p><strong>Gingerbread (GB, v2.3.x)</strong>: Galaxy S Plus, HTC Wildﬁre S, HTC Desire S, Galaxy S, Galaxy S2, Galaxy ACE, LG Optimus L3, Nexus S.</p>
+<p><strong>Ice Cream Sandwich (ICS, v4.0.x)</strong>: HTC Sensation,Galaxy S3, HTC Desire C, Galaxy S2, LG Optimus L5.</p>
+<p><strong>Jelly Bean (JB, v4.[1-3])</strong>: Nexus 4 (x2), Motorola Razr I, LG Optimus L7, Nexus S, Galaxy Note 1, HTC One S,HTC One X.</p>
+<p> 在我们的样本中，其他没有给出结果的设备包括Motorola Defy (Eclair, v2.1.x)、Nexus 4和Nexus 5 (KitKat, v4.4)。 </p>
+<h4 id="模式编写和验证，参见第三-A节"><a href="#模式编写和验证，参见第三-A节" class="headerlink" title="模式编写和验证，参见第三- A节"></a>模式编写和验证，参见第三- A节</h4><p>以下步骤用于测试分区：</p>
+<pre><code>**根访问**:为了能够逐位写入分区，我们首先需要对闪存进行低级访问。对于yaffs2，这意味着对原始flash的访问，而对于eMMC，这意味着对逻辑块的访问。Android不允许这样低层次的访问应用程序。相反，需要“根”设备。 我们通过已知的根利用或启动自定义恢复来实现这一点——在后者中，我们将首先备份库存恢复。之前的工作[22]建议通过引导加载程序加载自定义代码，而不需要在Android操作系统中进行根访问。然而，这只适用于今天的少数设备。
+
+ **编写模式**:我们在整个分区上编写标识模式。每个模式是设备块大小的1/4。对于外部存储，我们使用An- droid OS编写模式。对于数据分区，设备有时会崩溃并重新启动:在这种情况下，我们使用自定义在前面的步骤中启动了恢复。所有模式都用普通的10字节页眉和页脚分隔(图9)，并由4字节计数器(ID)唯一标识。我们用随机字节(RANDOM)填充每个模式以避免使用压缩的底层芯片，并在随机字节上添加一个16字节的md5摘要以进行验证。模式生成是在笔记本电脑上完成的，并通过加载安卓SDK的USB与Android调试桥(adb)工具一起发送到手机上(图8)。</code></pre><img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/i.png" class>
+
+
+
+
+<img src="/Carrieono/Carrieono.github/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/j.png" class>
+
+<p><strong>清洁</strong>:我们使用供应商提供的建议选项之一进行了擦拭16，即(i)在设置里的工厂复位，(ii)在恢复/引导加载模式。由于缺少格式化和由我们的模式引入的文件系统，一些设备可能无法在外部存储上执行擦除。在本例中，我们首先使用内置设置选项重新格式化它们。当我们安装了自定义恢复后，我们还将负责在擦除(与备份)之前重新安装原来的恢复。 </p>
+<p><strong>成像</strong>:我们使用类似的命令对整个分区进行成像，如图8所示。 </p>
+<p><strong>验证</strong>:最后一步是模式的恢复和验证。我们使用已知的页眉和页脚搜索未删除的模式候选项，然后通过验证随机数据上的摘要来验证每个候选项。我们还调查了磁盘的哪些百分比被适当地清理了(即，对于eMMC是0，对于原始闪存是1)，以确认它与恢复的模式的数量是一致的 。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Carrie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/">https://github.com/Carrieono/Carrieono.github.io/2020/03/25/%E5%AE%89%E5%8D%93%E5%B7%A5%E5%8E%82%E9%87%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"># 移动安全</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2020/03/24/hello-world/">Hello World</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Carrie | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
