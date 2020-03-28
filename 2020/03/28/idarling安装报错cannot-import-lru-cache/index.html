@@ -161,6 +161,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> partial</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">from</span> functools <span class="keyword">import</span> lru_cache</span><br><span class="line"><span class="keyword">except</span> ImportError:</span><br><span class="line">    <span class="keyword">from</span> backports.functools_lru_cache <span class="keyword">import</span> lru_cache</span><br></pre></td></tr></table></figure>
 
 <p>我在ida pro 文件夹下修改之后，依旧是报这个错，而且提示错误的位置都一样，不管我怎样改，这时候我才发现ida加载插件时是在appdata目录下，所以修改这个文件夹下的wedget就可(取消隐藏可见)，ida pro就显示正常了。</p>
+<p>这里记录几个连接：<br><a href="https://www.hex-rays.com/products/ida/support/idapython_docs/" target="_blank" rel="noopener">idapython_docs</a><br><a href="https://www.cnblogs.com/micro-chen/p/4770303.html" target="_blank" rel="noopener">ida pro py环境配置</a><br><a href="https://github.com/IDArlingTeam/IDArling">idarling源码</a><br><a href="https://baijiahao.baidu.com/s?id=1632860704719752231&wfr=spider&for=pc" target="_blank" rel="noopener">总结ida py问题</a></p>
 
         </div>
 
