@@ -143,71 +143,8 @@
 
         <div class="post-content">
             <p><a href="https://blog.csdn.net/LXQ1071717521/article/details/77675997" target="_blank" rel="noopener">WOJ1003-Birth of Noah</a><br>题目给了一个明确的家族数，很容易想到用C语言的结构体数组来表示，信息很明确，这道题卡在我的是，如何处理输入，在&lt;stdio.h&gt;中定义的EOF可用来判断输入结束，因为其值为-1，超过了0~127的ASCII码值，这样我写出了第一份代码：</p>
-<p>#include&lt;stdio.h&gt;<br>struct peoples{<br>    char name[12] ;<br>    int age;<br>    int gen;<br>};</p>
-<p>int main() {</p>
-<pre><code>struct peoples family[13]= { 
-    { &quot;Adam&quot;,930,1 },
-    {&quot;Seth&quot;,912,2 },
-    {&quot;Enosh&quot;, 905, 3 },
-    {&quot;Kenan&quot;,910,4},
-    {&quot;Mahalabel&quot;,962,5},
-    {&quot;Jared&quot;,962,6},
-    {&quot;Enoch&quot;,365,7},
-    {&quot;Methuselah&quot;,969,8},
-    {&quot;Lamech&quot;,777,9},
-    {&quot;Noah&quot;,NULL,10},
-    {&quot;Shem&quot;,NULL,11},
-    {&quot;Ham&quot;,NULL,11},
-    {&quot;Japheth&quot;,NULL,11}
-};
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">struct peoples&#123;</span><br><span class="line">    char name[12] ;</span><br><span class="line">    int age;</span><br><span class="line">    int gen;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line"></span><br><span class="line">    struct peoples family[13]&#x3D; &#123; </span><br><span class="line">        &#123; &quot;Adam&quot;,930,1 &#125;,</span><br><span class="line">        &#123;&quot;Seth&quot;,912,2 &#125;,</span><br><span class="line">        &#123;&quot;Enosh&quot;, 905, 3 &#125;,</span><br><span class="line">        &#123;&quot;Kenan&quot;,910,4&#125;,</span><br><span class="line">        &#123;&quot;Mahalabel&quot;,962,5&#125;,</span><br><span class="line">        &#123;&quot;Jared&quot;,962,6&#125;,</span><br><span class="line">        &#123;&quot;Enoch&quot;,365,7&#125;,</span><br><span class="line">        &#123;&quot;Methuselah&quot;,969,8&#125;,</span><br><span class="line">        &#123;&quot;Lamech&quot;,777,9&#125;,</span><br><span class="line">        &#123;&quot;Noah&quot;,NULL,10&#125;,</span><br><span class="line">        &#123;&quot;Shem&quot;,NULL,11&#125;,</span><br><span class="line">        &#123;&quot;Ham&quot;,NULL,11&#125;,</span><br><span class="line">        &#123;&quot;Japheth&quot;,NULL,11&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    char name0[12];</span><br><span class="line">    char name1[12];</span><br><span class="line">    int j;</span><br><span class="line">    int p1&#x3D;0, p2&#x3D;0;</span><br><span class="line">    while(scanf(&quot;%s %s&quot;,&amp;name0,&amp;name1)!&#x3D;EOF)&#123;</span><br><span class="line"></span><br><span class="line">            for ( j &#x3D; 0;j &lt; 13; j++) &#123;</span><br><span class="line">                if (name0 &#x3D;&#x3D; family[j].name)</span><br><span class="line">                &#123;</span><br><span class="line">                    p1 &#x3D; j;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            for ( j &#x3D; 0;j &lt; 13; j++) &#123;</span><br><span class="line">                if (name1&#x3D;&#x3D; family[j].name)</span><br><span class="line">                &#123;</span><br><span class="line">                    p2 &#x3D; j;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if(family[p1].gen&#x3D;&#x3D;NULL||family[p2].gen&#x3D;&#x3D;NULL)</span><br><span class="line">                printf(&quot;No enough information\n&quot;);</span><br><span class="line">            else if(family[p1].gen&lt;family[p2].gen)</span><br><span class="line">                printf(&quot;Yes\n&quot;);</span><br><span class="line">            else</span><br><span class="line">                printf(&quot;No\n&quot;);</span><br><span class="line"></span><br><span class="line">            if(!family[p1].age || !family[p2].age)</span><br><span class="line">            &#123;</span><br><span class="line">                printf(&quot;Not enough infomation\n&quot;);</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line">            else if(family[p1].age &gt; family[p2].age)</span><br><span class="line">            &#123;</span><br><span class="line">                    printf(&quot;Yes\n&quot;);</span><br><span class="line">                    continue;</span><br><span class="line">            &#125;</span><br><span class="line">            else</span><br><span class="line">                    &#123;</span><br><span class="line">                        printf(&quot;No\n&quot;);</span><br><span class="line">                        continue;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-char name0[12];
-char name1[12];
-int j;
-int p1=0, p2=0;
-while(scanf(&quot;%s %s&quot;,&amp;name0,&amp;name1)!=EOF){
-
-        for ( j = 0;j &lt; 13; j++) {
-            if (name0 == family[j].name)
-            {
-                p1 = j;
-                break;
-            }
-        }
-        for ( j = 0;j &lt; 13; j++) {
-            if (name1== family[j].name)
-            {
-                p2 = j;
-                break;
-            }
-        }
-
-        if(family[p1].gen==NULL||family[p2].gen==NULL)
-            printf(&quot;No enough information\n&quot;);
-        else if(family[p1].gen&lt;family[p2].gen)
-            printf(&quot;Yes\n&quot;);
-        else
-            printf(&quot;No\n&quot;);
-
-        if(!family[p1].age || !family[p2].age)
-        {
-            printf(&quot;Not enough infomation\n&quot;);
-            continue;
-        }
-        else if(family[p1].age &gt; family[p2].age)
-        {
-                printf(&quot;Yes\n&quot;);
-                continue;
-        }
-        else
-                {
-                    printf(&quot;No\n&quot;);
-                    continue;
-                }
-
-}
-
-return 0;</code></pre><p>}</p>
 <p>但是<strong>结果错误</strong>，问题在于debug的时候发现，比如说family[0]与第一次循环输入的”Adam”应该相同，但是我们忽略了接收”Adam”时从缓冲区中读取了12个字节的内容，也就是说name0的内容是“Adam\0？？？？？？？”，而family[0]应该是“Adam….\0”,这时候通过“==”来判定是不合适的，所以应该改用strcmp，因为strcmp在遇到“\0”就停止了（另一种停止的情况是在比较中第一次发现不相等就退出）。</p>
 <p>当然还有一个遗留问题，我的代码结果其实是对的，但是测试还是没有通过，是因为一个很奇怪的输入问题，scanf并没有读取到把第二行送入的标识，所以第一行因为换行符得到执行，但第二行却得不到执行，需要额外输入一个回车！疑惑！！！！</p>
 
