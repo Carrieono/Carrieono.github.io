@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Carrie">
+
+
+    <meta name="subtitle" content="再相逢，希望我们都在更高处。">
+
+
+    <meta name="description" content="菜鸡的自我修养">
+
+
+    <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
+
+
+<title>gdb peda调试几个注意点 | Carrie&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Carrie&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Carrie&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">gdb peda调试几个注意点</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Carrie</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">四月 7, 2020&nbsp;&nbsp;21:05:33</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CyberSecurity/">CyberSecurity</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>1.gdb几个常用命令</p>
+<p>n： 执行一行源代码但不进入函数内部<br>ni: 执行一行汇编代码但不进入函数内部<br>s： 执行一行源代码而且进入函数内部<br>si: 执行一行汇编代码而且进入函数内部<br>c: 继续执行到下一个断点<br>b *地址: 下断点 </p>
+<p>enable   激活断点</p>
+<p>disable   禁用断点</p>
+<p>info b    查看断点</p>
+<p>del num  删除断点directory+源码所在目录：加载程序源码<br>set follow-fork-mode parent ：只调试主进程 </p>
+<p>stack 100　　 插件提供的，显示栈中100项</p>
+<p>find xxx　　  快速查找，很实用</p>
+<p>ropgadget - 获取二进制或库的通用ROP小工具</p>
+<p>ropsearch - 在内存中搜索ROP小工具</p>
+<p>pattern - 生成，搜索或写入循环模式到内存</p>
+<p>pattern offset 计算缓冲区大小</p>
+<p>shellcode - 生成或下载常用的shellcode</p>
+<p>vmmap – 可以用来查看栈、bss段是否可以执行</p>
+<p>objdump -d ./文件名   查看程序的反汇编，从而可以看到函数的地址</p>
+<p>stack: 显示栈信息 </p>
+<p>x/wx $esp 　　以4字节16进制显示栈中内容</p>
+<p>x ： 按十六进制格式显示内存数据，其中x/{字节数}x 以16进制显示指定地址处的数据;{字节数}表示字节数制定（b 单字节；h 双字节；w 四字节；g 八字节；默认为四字节） </p>
+<p>2.peda</p>
+<p>一个好用的gdb插件，介绍几个命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">checksec filename</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/1.png" class>
+
+<ul>
+<li><p>NX（DEP）数据执行防护</p>
+<p> NX即No-eXecute（不可执行）的意思，NX（DEP）的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcc -o  hello test.c // 默认情况下，开启NX保护</span><br><span class="line">gcc -z execstack -o  hello test.c // 禁用NX保护</span><br><span class="line">gcc -z noexecstack -o  hello test.c // 开启NX保护</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Canary（FS）栈溢出保护</p>
+<p> 当启用栈保护后，函数开始执行的时候会先往栈里插入cookie信息，当函数真正返回的时候会验证cookie信息是否合法，如果不合法就停止程序运行。攻击者在覆盖返回地址的时候往往也会将cookie信息给覆盖掉，导致栈保护检查失败而阻止shellcode的执行。在Linux中我们将cookie信息称为canary。 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcc -fno-stack-protector -o hello test.c   //禁用栈保护</span><br><span class="line">gcc -fstack-protector -o hello test.c    //启用堆栈保护，不过只为局部变量中含有 char 数组的函数插入保护代码</span><br><span class="line">gcc -fstack-protector-all -o hello test.c  //启用堆栈保护，为所有函数插入保护代码</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>RELRO </p>
+<p>Relocation Read-Only (RELRO)  此项技术主要针对 GOT 改写的攻击方式。它分为两种，Partial RELRO 和 Full RELRO。<br> 部分RELRO 易受到攻击，例如攻击者可以<strong>atoi.got为system.plt，进而输入/bin/sh\x00获得shell</strong><br> 完全RELRO 使整个 GOT 只读，从而无法被覆盖，但这样会大大增加程序的启动时间，因为程序在启动之前需要解析所有的符号。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hello test.c // 默认情况下，是Partial RELRO</span><br><span class="line">gcc -z norelro -o hello test.c // 关闭，即No RELRO</span><br><span class="line">gcc -z lazy -o hello test.c // 部分开启，即Partial RELRO</span><br><span class="line">gcc -z now -o hello test.c // 全部开启，即Full RELRO</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PIE/ASLR（代码地址随机化）:</p>
+<p>PIE(Position-Independent Executable, 位置无关可执行文件)技术与 ASLR 技术类似,ASLR 将程序运行时的堆栈以及共享库的加载地址随机化, 而 PIE 技术则在编译时将程序编译为位置无关, 即程序运行时各个段（如代码段等）加载的虚拟地址也是在装载时才确定。这就意味着, 在 PIE 和 ASLR 同时开启的情况下, 攻击者将对程序的内存布局一无所知, 传统的改写<br> GOT 表项的方法也难以进行, 因为攻击者不能获得程序的.got 段的虚地址。<br> 若开启一般需在攻击时泄露地址信息:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hello test.c  // 默认情况下，不开启PIE</span><br><span class="line">gcc -fpie -pie -o hello test.c  // 开启PIE，此时强度为1</span><br><span class="line">gcc -fPIE -pie -o hello test.c  // 开启PIE，此时为最高强度2</span><br><span class="line">(还与运行时系统ALSR设置有关）</span><br></pre></td></tr></table></figure>
+
+<p>一般情况下NX（Windows平台上称其为DEP）和地址空间分布随机化（ASLR）会同时工作。</p>
+<p>内存地址随机化机制（address space layout randomization)，有以下三种情况</p>
+<p>0 - 表示关闭进程地址空间随机化。</p>
+<p>1 - 表示将mmap的基址，stack和vdso页面随机化。</p>
+<p>2 - 表示在1的基础上增加栈（heap）的随机化。</p>
+<p>可以防范基于Ret2libc方式的针对DEP的攻击。ASLR和DEP配合使用，能有效阻止攻击者在堆栈上运行恶意代码。</p>
+</li>
+<li><p>FORTIFY</p>
+<p>这是一个由GCC实现的源码级别的保护机制，其功能是在编译的时候检查源码以避免潜在的缓冲区溢出等错误。<br> 简单地说，加了这个保护之后,一些敏感函数如read, fgets,memcpy, printf等等可能<br> 导致漏洞出现的函数都会被替换成<strong>read_chk,</strong>fgets_chk, __memcpy_chk, __printf_chk等。<br> 这些带了chk的函数会检查读取/复制的字节长度是否超过缓冲区长度，</p>
+<p>通过检查诸如%n之类的字符串位置是否位于可能被用户修改的可写地址，<br> 避免了格式化字符串跳过某些参数（如直接%7$x）等方式来避免漏洞出现。<br> 开启了FORTIFY保护的程序会被checksec检出，此外，在反汇编时直接查看got表也会发现chk函数的存在<br> 这种检查是默认不开启的，可以通过</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -D_FORTIFY_SOURCE=2 -O1</span><br></pre></td></tr></table></figure>
+
+<p>开启fortity检查，开启后会替换strcpy等危险函数。</p>
+</li>
+</ul>
+<p>3.</p>
+<p><a href="https://blog.csdn.net/SmalOSnail/article/details/53149426" target="_blank" rel="noopener">PEDA用法总结</a></p>
+<p><a href="https://www.jianshu.com/p/755e52d48a77" target="_blank" rel="noopener">checksec工具使用-pwn</a></p>
+<p><a href="https://www.cnblogs.com/HacTF/p/8052175.html" target="_blank" rel="noopener">Linux下pwn从入门到放弃</a></p>
+<p>有关缓冲区溢出栈帧变化：</p>
+<p><a href="https://blog.csdn.net/linyt/article/details/43283331" target="_blank" rel="noopener">缓冲区溢出攻击实践</a></p>
+<p>有关构造payload时的计算：</p>
+<p><a href="https://www.jianshu.com/p/214d8593cfd4" target="_blank" rel="noopener">黑客攻防入门(三)shellcode进阶</a></p>
+<p>shellcode模板:</p>
+<p><a href="https://www.cnblogs.com/Kali-Team/p/12260582.html" target="_blank" rel="noopener">ShellCode模板</a></p>
+<p><a href="http://blog.nsfocus.net/easy-implement-shellcode-xiangjie/" target="_blank" rel="noopener">【干货分享】手把手简易实现shellcode及详解</a></p>
+<p><a href="https://bbs.pediy.com/thread-229398.htm" target="_blank" rel="noopener">[原创]windows下shellcode提取模板的实现</a></p>
+<p>shellcode编写：</p>
+<p><a href="https://blog.csdn.net/qq_37414405/article/details/84866944?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2" target="_blank" rel="noopener">shellcode的简介和编写</a></p>
+<p><a href>二进制入门-打造Linux shellcode基础篇</a></p>
+<p><a href="https://blog.csdn.net/linyt/article/details/43371273" target="_blank" rel="noopener">如何编写本地shellcode</a></p>
+<p><a href="https://www.cnblogs.com/findumars/p/8030433.html" target="_blank" rel="noopener">Linux下如何生成core dump 文件（解决segment fault段错误的问题）</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Carrie</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/">https://github.com/Carrieono/Carrieono.github.io/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/pwn/"># pwn</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/">关于大端小端</a>
+            
+            
+            <a class="next" rel="next" href="/2020/04/06/%E5%BF%98%E8%AE%B0ubuntu-root%E5%AF%86%E7%A0%81%E5%A6%82%E4%BD%95/">忘记ubuntu root密码如何</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Carrie | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -18,7 +18,7 @@
     <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
 
 
-<title>忘记ubuntu root密码如何 | Carrie&#39;s Blog</title>
+<title>关于大端小端 | Carrie&#39;s Blog</title>
 
 
 
@@ -117,7 +117,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">忘记ubuntu root密码如何</h1>
+            <h1 class="post-title">关于大端小端</h1>
             
                 <div class="post-meta">
                     
@@ -126,14 +126,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">四月 6, 2020&nbsp;&nbsp;9:48:17</a>
+                        Date: <a href="#">四月 8, 2020&nbsp;&nbsp;23:04:39</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CyberSecurity/">CyberSecurity</a>
+                                <a href="/categories/%E5%B0%8F%E6%9C%8B%E5%8F%8B%E4%BD%A0%E6%98%AF%E5%90%A6%E6%9C%89%E5%BE%88%E5%A4%9A%E9%97%AE%E5%8F%B7/">小朋友你是否有很多问号</a>
                             
                         </span>
                     
@@ -142,7 +142,13 @@
         </header>
 
         <div class="post-content">
-            <p>又叒叒叒忘记了linux密码，一般而言如果当前具有sudo权限的话，直接用sudo passwd root可以更改；若没有sudo 权限，需要进入GRUB修改kernel镜像启动参数，没有试过，参考链接：<br><a href="https://www.linuxidc.com/Linux/2016-05/131256.htm" target="_blank" rel="noopener">Ubuntu 14.04中root 密码忘记解决方法</a></p>
+            <p>牢记，大端高尾，小端低尾！</p>
+<p>大端字节序，高位字节放在低位地址，反之，小端的话高位字节放在高位地址。</p>
+<p>两种字节序没有标准可循，都有系统在使用。把某个给定系统所用的字节序称为主机字节序，可以用以下程序输出主机字节序。方法是在一个短整数变量中存放2字节的值0x0102，然后查看它的连续字节c[0]和c[1]，以此确定字节序。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        short s;</span><br><span class="line">        <span class="keyword">char</span> c[<span class="keyword">sizeof</span>(short)];</span><br><span class="line">    &#125; un;</span><br><span class="line">    un.s = <span class="number">0x0102</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">sizeof</span>(short)==<span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span>(un.c[<span class="number">0</span>]==<span class="number">1</span> &amp;&amp; un.c[<span class="number">1</span>] == <span class="number">2</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"big-endian\n"</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (un.c[<span class="number">0</span>] == <span class="number">2</span> &amp;&amp; un.c[<span class="number">1</span>] == <span class="number">1</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"little-endian\n"</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"unknown\n"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"sizeof(short)= %d\n"</span>,<span class="keyword">sizeof</span>(short));</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考链接：</p>
+<p><a href="https://www.cnblogs.com/wuyuegb2312/archive/2013/06/08/3126510.html" target="_blank" rel="noopener">轻松记住大端小端的含义</a></p>
 
         </div>
 
@@ -157,7 +163,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/06/%E5%BF%98%E8%AE%B0ubuntu-root%E5%AF%86%E7%A0%81%E5%A6%82%E4%BD%95/">https://github.com/Carrieono/Carrieono.github.io/2020/04/06/%E5%BF%98%E8%AE%B0ubuntu-root%E5%AF%86%E7%A0%81%E5%A6%82%E4%BD%95/</a></span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/">https://github.com/Carrieono/Carrieono.github.io/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/</a></span>
                     </p>
                 
                 
@@ -181,7 +187,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/linux/"># linux</a>
+                        <a href="/tags/%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/"># 大端小端</a>
                     
                         
                 </span>
@@ -194,10 +200,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/">gdb peda调试几个注意点</a>
             
-            
-            <a class="next" rel="next" href="/2020/03/31/WOJ1008-Feeding-Animals-II/">WOJ1008-Feeding Animals(II)</a>
+            <a class="next" rel="next" href="/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/">gdb peda调试几个注意点</a>
             
         </section>
 
