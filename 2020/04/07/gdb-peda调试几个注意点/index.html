@@ -161,6 +161,11 @@
 <p>x/wx $esp 　　以4字节16进制显示栈中内容</p>
 <p>x ： 按十六进制格式显示内存数据，其中x/{字节数}x 以16进制显示指定地址处的数据;{字节数}表示字节数制定（b 单字节；h 双字节；w 四字节；g 八字节；默认为四字节） </p>
 <p>2.peda</p>
+<p>源码安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/longld/peda.git ~/peda</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">"source ~/peda/peda.py"</span> &gt;&gt; ~/.gdbinit</span><br></pre></td></tr></table></figure>
+
+
+
 <p>一个好用的gdb插件，介绍几个命令</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">checksec filename</span><br></pre></td></tr></table></figure>
 
@@ -205,6 +210,23 @@
 </ul>
 <p>3.打开生成core dump的开关 </p>
 <p> ulimit -c unlimited 大小不受限制 </p>
+<p>4.汇编实验相关：</p>
+<table>
+<thead>
+<tr>
+<th align="left">call</th>
+<th>push next inst;push old ebp</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">leave</td>
+<td>mov esp,ebp;pop ebp</td>
+</tr>
+<tr>
+<td align="left">ret</td>
+<td>pop eip</td>
+</tr>
+</tbody></table>
 <p><a href="https://blog.csdn.net/SmalOSnail/article/details/53149426" target="_blank" rel="noopener">PEDA用法总结</a></p>
 <p><a href="https://www.jianshu.com/p/755e52d48a77" target="_blank" rel="noopener">checksec工具使用-pwn</a></p>
 <p><a href="https://www.cnblogs.com/HacTF/p/8052175.html" target="_blank" rel="noopener">Linux下pwn从入门到放弃</a></p>
@@ -220,7 +242,10 @@
 <p><a href="https://blog.csdn.net/qq_37414405/article/details/84866944?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2" target="_blank" rel="noopener">shellcode的简介和编写</a></p>
 <p><a href>二进制入门-打造Linux shellcode基础篇</a></p>
 <p><a href="https://blog.csdn.net/linyt/article/details/43371273" target="_blank" rel="noopener">如何编写本地shellcode</a></p>
+<p>关于core dump：</p>
 <p><a href="https://www.cnblogs.com/findumars/p/8030433.html" target="_blank" rel="noopener">Linux下如何生成core dump 文件（解决segment fault段错误的问题）</a></p>
+<p><a href="https://www.cnblogs.com/SophiaTang/archive/2013/04/14/3020145.html" target="_blank" rel="noopener"><a href="https://www.cnblogs.com/SophiaTang/archive/2013/04/14/3020145.html" target="_blank" rel="noopener">coredump位置修改</a>
+ </a></p>
 
         </div>
 
