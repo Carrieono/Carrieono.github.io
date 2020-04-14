@@ -18,7 +18,7 @@
     <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
 
 
-<title>关于大端小端 | Carrie&#39;s Blog</title>
+<title>缓冲区溢出实验TIPS | Carrie&#39;s Blog</title>
 
 
 
@@ -117,7 +117,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">关于大端小端</h1>
+            <h1 class="post-title">缓冲区溢出实验TIPS</h1>
             
                 <div class="post-meta">
                     
@@ -126,14 +126,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">四月 8, 2020&nbsp;&nbsp;23:04:39</a>
+                        Date: <a href="#">四月 14, 2020&nbsp;&nbsp;21:26:12</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/%E5%B0%8F%E6%9C%8B%E5%8F%8B%E4%BD%A0%E6%98%AF%E5%90%A6%E6%9C%89%E5%BE%88%E5%A4%9A%E9%97%AE%E5%8F%B7/">小朋友你是否有很多问号</a>
+                                <a href="/categories/CyberSecurity/">CyberSecurity</a>
                             
                         </span>
                     
@@ -142,13 +142,9 @@
         </header>
 
         <div class="post-content">
-            <p>牢记，大端高尾，小端低尾！</p>
-<p>大端字节序，高位字节放在低位地址，反之，小端的话高位字节放在高位地址。</p>
-<p>两种字节序没有标准可循，都有系统在使用。把某个给定系统所用的字节序称为主机字节序，可以用以下程序输出主机字节序。方法是在一个短整数变量中存放2字节的值0x0102，然后查看它的连续字节c[0]和c[1]，以此确定字节序。 </p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        short s;</span><br><span class="line">        <span class="keyword">char</span> c[<span class="keyword">sizeof</span>(short)];</span><br><span class="line">    &#125; un;</span><br><span class="line">    un.s = <span class="number">0x0102</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">sizeof</span>(short)==<span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span>(un.c[<span class="number">0</span>]==<span class="number">1</span> &amp;&amp; un.c[<span class="number">1</span>] == <span class="number">2</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"big-endian\n"</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (un.c[<span class="number">0</span>] == <span class="number">2</span> &amp;&amp; un.c[<span class="number">1</span>] == <span class="number">1</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"little-endian\n"</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"unknown\n"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"sizeof(short)= %d\n"</span>,<span class="keyword">sizeof</span>(short));</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>参考链接：</p>
-<p><a href="https://www.cnblogs.com/wuyuegb2312/archive/2013/06/08/3126510.html" target="_blank" rel="noopener">轻松记住大端小端的含义</a></p>
+            <p>1.格式化字符串漏洞</p>
+<p>%c：输出字符。<br>%u：无符号10进制整数<br>%d：输出十进制整数。<br>%x：输出16进制数据，如%i$x表示要泄漏偏移i处4字节长的16进制数据，%i$lx表示要泄漏偏移i处8字节长的16进制数据，32bit和64bit环境下一样。<br>%p：输出16进制数据，与%x基本一样，只是附加了前缀0x，在32bit下输出4字节，在64bit下输出8字节，可通过输出字节的长度来判断目标环境是32bit还是64bit。<br>%s：输出的内容是字符串，即将偏移处指针指向的字符串输出，如%i$s表示输出偏移i处地址所指向的字符串，在32bit和64bit环境下一样，可用于读取GOT表等信息。<br>%n：将%n之前printf已经打印的字符个数赋值给偏移处指针所指向的地址位置，如%100×10$n表示将0x64写入偏移10处保存的指针所指向的地址（4字节），而%$hn表示写入的地址空间为2字节，%$hhn表示写入的地址空间为1字节，%]$lln表示写入的地址空间为8字节，在32bit和64bit环境下一样。有时，直接写4字节会导致程序崩溃或等候时间过长，可以通过%$hn或%$hhn来适时调整。<br>而这些参数中，能够改变地址中值的参数只有%n。<br>关键：%n是通过格式化字符串漏洞改变程序流程的关键方式，而其他格式化字符串参数可用于读取信息或配合%n写数据。简单而言，通过%n是可以往内存里写东西的，可通过一系列构造来修改指定的返回地址。<br>————————————————<br>版权声明：本文为CSDN博主「如梦如幻似清茶」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。<br>原文链接：<a href="https://blog.csdn.net/qq_36779888/article/details/89684453" target="_blank" rel="noopener">https://blog.csdn.net/qq_36779888/article/details/89684453</a></p>
+<p>2.</p>
 
         </div>
 
@@ -163,7 +159,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/">https://github.com/Carrieono/Carrieono.github.io/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/</a></span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/14/%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8CTIPS/">https://github.com/Carrieono/Carrieono.github.io/2020/04/14/%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8CTIPS/</a></span>
                     </p>
                 
                 
@@ -187,7 +183,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/"># 大端小端</a>
+                        <a href="/tags/C-language/"># C-language</a>
                     
                         
                 </span>
@@ -200,10 +196,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2020/04/14/%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8CTIPS/">缓冲区溢出实验TIPS</a>
             
-            
-            <a class="next" rel="next" href="/2020/04/07/gdb-peda%E8%B0%83%E8%AF%95%E5%87%A0%E4%B8%AA%E6%B3%A8%E6%84%8F%E7%82%B9/">gdb peda调试几个注意点</a>
+            <a class="next" rel="next" href="/2020/04/08/%E5%85%B3%E4%BA%8E%E5%A4%A7%E7%AB%AF%E5%B0%8F%E7%AB%AF/">关于大端小端</a>
             
         </section>
 
