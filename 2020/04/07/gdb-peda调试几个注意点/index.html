@@ -160,6 +160,8 @@
 <p>stack: 显示栈信息 </p>
 <p>x/wx $esp 　　以4字节16进制显示栈中内容</p>
 <p>x ： 按十六进制格式显示内存数据，其中x/{字节数}x 以16进制显示指定地址处的数据;{字节数}表示字节数制定（b 单字节；h 双字节；w 四字节；g 八字节；默认为四字节） </p>
+<p> 常用的gdb命令<br>backtrace 显示程序中的当前位置和表示如何到达当前位置的栈跟踪（同义词：where）<br>breakpoint 在程序中设置一个断点<br>cd 改变当前工作目录<br>clear 删除刚才停止处的断点<br>commands 命中断点时，列出将要执行的命令<br>continue 从断点开始继续执行<br>delete 删除一个断点或监测点；也可与其他命令一起使用<br>display 程序停止时显示变量和表达时<br>down 下移栈帧，使得另一个函数成为当前函数<br>frame 选择下一条continue命令的帧<br>info 显示与该程序有关的各种信息<br>jump 在源程序中的另一点开始运行<br>kill 异常终止在gdb 控制下运行的程序<br>list 列出相应于正在执行的程序的原文件内容<br>next 执行下一个源程序行，从而执行其整体中的一个函数<br>print 显示变量或表达式的值<br>pwd 显示当前工作目录<br>pype 显示一个数据结构（如一个结构或C++类）的内容<br>quit 退出gdb<br>reverse-search 在源文件中反向搜索正规表达式<br>run 执行该程序<br>search 在源文件中搜索正规表达式<br>set variable 给变量赋值<br>signal 将一个信号发送到正在运行的进程<br>step 执行下一个源程序行，必要时进入下一个函数<br>undisplay display命令的反命令，不要显示表达式<br>until 结束当前循环<br>up 上移栈帧，使另一函数成为当前函数<br>watch 在程序中设置一个监测点（即数据断点）<br>whatis 显示变量或函数类型 </p>
+<p> set disassembly-flavor intel </p>
 <p>2.peda</p>
 <p>源码安装：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/longld/peda.git ~/peda</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">"source ~/peda/peda.py"</span> &gt;&gt; ~/.gdbinit</span><br></pre></td></tr></table></figure>
