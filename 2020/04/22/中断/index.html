@@ -18,7 +18,7 @@
     <meta name="keywords" content="C，Python，逆向，恶意代码，网络安全">
 
 
-<title>dos debug | Carrie&#39;s Blog</title>
+<title>中断 | Carrie&#39;s Blog</title>
 
 
 
@@ -117,7 +117,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">dos debug</h1>
+            <h1 class="post-title">中断</h1>
             
                 <div class="post-meta">
                     
@@ -126,7 +126,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">四月 22, 2020&nbsp;&nbsp;9:52:03</a>
+                        Date: <a href="#">四月 22, 2020&nbsp;&nbsp;22:05:46</a>
                         </span>
                     
                     
@@ -142,7 +142,55 @@
         </header>
 
         <div class="post-content">
-            <p> 名称 解释 格式<br>a (Assemble) 逐行汇编 a [address]<br>c (Compare) 比较两内存块 c range address<br>d (Dump) 内存16进制显示 d [address]或 d [range]<br>e (Enter) 修改内存字节 e address [list]<br>f (fin) 预置一段内存 f range list<br>g (Go) 执行程序 g [=address][address…]<br>h (Hexavithmetic) 制算术运算 h value value<br>i (Input) 从指定端口地址输入 i pataddress<br>l (Load) 读盘 l [address [driver seetor&gt;<br>m (Move) 内存块传送 m range address<br>n (Name) 置文件名 n filespec [filespec…]<br>o (Output) 从指定端口地址输出 o portadress byte<br>q (Quit) 结束 q<br>r (Register) 显示和修改寄存器 r [register name]<br>s (Search) 查找字节串 s range list<br>t (Trace) 跟踪执行 t [=address] [value]<br>u (Unassemble) 反汇编 u [address ]或range<br>w (Write) 存盘 w [address[driver sector secnum&gt;<br>? 联机帮助 ? </p>
+            <ol>
+<li><p><strong>按中断源的重要性和实时性，排出响应中断的次序，这种次序称为中断优先级。</strong> </p>
+<p><strong>在8086</strong>中，中断优先级从高到低的次序为：</p>
+<p>―<strong>除法错、INT n</strong>、<strong>INTO</strong> ；最高级，同一行的</p>
+</li>
+</ol>
+<p>​                                             ；有同等优先级</p>
+<p>​        ― <strong>NMI</strong> <strong>；次高级</strong></p>
+<p>​        ― <strong>INTR</strong> ；较低级（由8259A引入）</p>
+<p>​        ―<strong>单步中断</strong> ；最低级</p>
+<ol start="2">
+<li><p>中断定义：</p>
+<p>中断分为：</p>
+<p>① <strong>外部中断或硬件中断，从不可屏蔽中断引脚NMI和可屏蔽中断引脚INTR引入</strong>；</p>
+<p><strong>1</strong>）<strong>外部中断</strong></p>
+<p><strong>不可屏蔽中断NMI</strong>，处理较紧急的情况，如存储器或I/O校验错、掉电、协处理器异常中断请求等，不受中断标志IF的影响。</p>
+<p>可屏蔽中断由8259A的INT引脚输出，连到CPU的<strong>INTR</strong>上。只有当CPU的FLAGS的IF=1时，才允许响应此类中断请求。</p>
+<p>8259A的输入引脚IR0~IR7可引入<strong>8级中断</strong>：时钟、键盘、串行通信口COM1和COM2、硬盘、软盘、打印机。经芯片内部判别后，将优先级高的中断请求信号送到INT引脚。</p>
+<p>②<strong>内部中断或软件中断，是为解决CPU运行过程中出现的一些意外事件或便于程序调试而设置的</strong>。</p>
+<p><strong>（1）除法错中断</strong></p>
+<p>执行除法运算指令时，如除数为0或商超过了结果寄存器能容纳的范围，则产生除法错中断。</p>
+<p><strong>（2）单步中断</strong></p>
+<p>单步标志TF置1，指令执行完后，产生单步中断。结果是将CPU的内部寄存器和有关存储器的内容显示出来，便于跟踪程序的执行过程，实现动态排错。</p>
+</li>
+<li><p>记录几个IR</p>
+<img src="/2020/04/22/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD.png" class>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</li>
+</ol>
 
         </div>
 
@@ -157,7 +205,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/22/dos-debug/">https://github.com/Carrieono/Carrieono.github.io/2020/04/22/dos-debug/</a></span>
+                        <span><a href="https://github.com/Carrieono/Carrieono.github.io/2020/04/22/%E4%B8%AD%E6%96%AD/">https://github.com/Carrieono/Carrieono.github.io/2020/04/22/%E4%B8%AD%E6%96%AD/</a></span>
                     </p>
                 
                 
@@ -181,7 +229,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/windows/"># windows</a>
+                        <a href="/tags/8086/"># 8086</a>
                     
                         
                 </span>
@@ -194,10 +242,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2020/04/22/%E4%B8%AD%E6%96%AD/">中断</a>
             
-            
-            <a class="next" rel="next" href="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/">×86汇编学习</a>
+            <a class="next" rel="next" href="/2020/04/22/dos-debug/">dos debug</a>
             
         </section>
 
