@@ -146,7 +146,34 @@
 <li><p>8086/8088的<a href="https://www.baidu.com/s?wd=汇编语言&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao" target="_blank" rel="noopener">汇编语言</a>里面,以字母开头的16进制数，前面必须加“0”。如0a2h,0fdh,0bcdeh等。 主要是汇编语言编译器的设计者需要用户按这个规则编程,否则它设计的编译器不知道你写的是什么。</p>
 <p>因为标号不能以0～9的数字开头,但可以以字母开头，<strong>导致无法识别数值与标记</strong>。</p>
 </li>
-<li></li>
+<li><p><a href="https://www.cnblogs.com/gkp307/p/9916558.html" target="_blank" rel="noopener">div指令和mul指令</a></p>
+<p>div是除法指令，使用div做除法时需要注意:</p>
+<p>1)除数:有8位和16位两种，在一个寄存器或者内存单元中</p>
+<p>2)被除数:默认存放在AX或DX和AX中。</p>
+<p>如果除数为8位，被除数则为16位，默认在AX中存放；</p>
+<p>如果除数为16位，被除数为32位，在DX和AX中存放，DX存放高16位，AX存放低16位。</p>
+<p>3)结果:如果除数为8位，则AL存储商，AH存储余数；如果除数为16位，则AX存储商，DX存储余数。</p>
+</li>
+</ol>
+<p>   mul是乘法指令，使用mul时注意一下两点:</p>
+<p>   1)两个相乘的数，要么都是8位，要么都是16位。</p>
+<p>   如果是8位，一个默认放在AL中，另一个放在8位寄存器或内存字节单元中；</p>
+<p>   如果是16位，一个默认在AX中，另一个放在16位寄存器或内存字单元中。</p>
+<p>   2)结果:如果是8位乘法，结果默认放在AX中;如果是16位乘法，结果高位默认在DX中存放，低位在AX中放。</p>
+<p>   格式如下:</p>
+<p>   mul 寄存器</p>
+<p>   mul 内存单元</p>
+<p>   <a href="https://www.cnblogs.com/gkp307/p/9916558.html" target="_blank" rel="noopener">参考链接</a></p>
+<ol start="3">
+<li><p>实验10三个实验</p>
+<p><a href="https://www.cnblogs.com/nojacky/p/9523904.html" target="_blank" rel="noopener">参考实验</a></p>
+</li>
+<li><p>执行loop s时，首先要将（cx）减1，若（cx）不为0，则前往s </p>
+</li>
+<li><p>对于标志寄存器而言</p>
+<p>无符号运算有意义：CF，进位/借位标志</p>
+<p>有符号运算有意义：OF，溢出标志</p>
+</li>
 </ol>
 
         </div>
@@ -198,6 +225,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/22/dos-debug/">dos debug</a>
             
             
             <a class="next" rel="next" href="/2020/04/14/%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8CTIPS/">缓冲区溢出实验TIPS</a>
