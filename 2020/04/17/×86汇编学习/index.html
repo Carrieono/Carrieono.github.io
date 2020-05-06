@@ -113,6 +113,68 @@
             <div class="container">
     
     
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
 
     
     <article class="post-wrap">
@@ -146,8 +208,7 @@
 <li><p>8086/8088的<a href="https://www.baidu.com/s?wd=汇编语言&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao" target="_blank" rel="noopener">汇编语言</a>里面,以字母开头的16进制数，前面必须加“0”。如0a2h,0fdh,0bcdeh等。 主要是汇编语言编译器的设计者需要用户按这个规则编程,否则它设计的编译器不知道你写的是什么。</p>
 <p>因为标号不能以0～9的数字开头,但可以以字母开头，<strong>导致无法识别数值与标记</strong>。</p>
 </li>
-<li><p><a href="https://www.cnblogs.com/gkp307/p/9916558.html" target="_blank" rel="noopener">div指令和mul指令</a></p>
-<p>div是除法指令，使用div做除法时需要注意:</p>
+<li><h2 id="div指令和mul指令"><a href="#div指令和mul指令" class="headerlink" title="div指令和mul指令"></a><a href="https://www.cnblogs.com/gkp307/p/9916558.html" target="_blank" rel="noopener">div指令和mul指令</a></h2><p>div是除法指令，使用div做除法时需要注意:</p>
 <p>1)除数:有8位和16位两种，在一个寄存器或者内存单元中</p>
 <p>2)被除数:默认存放在AX或DX和AX中。</p>
 <p>如果除数为8位，被除数则为16位，默认在AX中存放；</p>
@@ -165,16 +226,130 @@
 <p>   mul 内存单元</p>
 <p>   <a href="https://www.cnblogs.com/gkp307/p/9916558.html" target="_blank" rel="noopener">参考链接</a></p>
 <ol start="3">
-<li><p>实验10三个实验</p>
-<p><a href="https://www.cnblogs.com/nojacky/p/9523904.html" target="_blank" rel="noopener">参考实验</a></p>
+<li><h2 id="实验10三个实验"><a href="#实验10三个实验" class="headerlink" title="实验10三个实验"></a>实验10三个实验</h2><p><a href="https://www.cnblogs.com/nojacky/p/9523904.html" target="_blank" rel="noopener">参考实验</a></p>
 </li>
-<li><p>执行loop s时，首先要将（cx）减1，若（cx）不为0，则前往s </p>
-</li>
-<li><p>对于标志寄存器而言</p>
-<p>无符号运算有意义：CF，进位/借位标志</p>
+<li><h2 id="执行loop-s时，首先要将（cx）减1，若（cx）不为0，则前往s"><a href="#执行loop-s时，首先要将（cx）减1，若（cx）不为0，则前往s" class="headerlink" title="执行loop s时，首先要将（cx）减1，若（cx）不为0，则前往s"></a>执行loop s时，首先要将（cx）减1，若（cx）不为0，则前往s</h2></li>
+<li><h2 id="对于标志寄存器而言"><a href="#对于标志寄存器而言" class="headerlink" title="对于标志寄存器而言"></a>对于标志寄存器而言</h2><p>无符号运算有意义：CF，进位/借位标志</p>
 <p>有符号运算有意义：OF，溢出标志</p>
 </li>
 </ol>
+<h2 id="5-movsb-movsw-movsd-指令详解"><a href="#5-movsb-movsw-movsd-指令详解" class="headerlink" title="5.movsb movsw movsd 指令详解"></a>5.movsb movsw movsd 指令详解</h2><p>这三个指令，都是数据传送指令,都是从源地址向目的地址传送数据。</p>
+<p>16位模式下：<br>源地址是DS:SI,目的地址是ES:DI<br>32位模式下：<br>源地址是DS:ESI,目的地址是ES:EDI</p>
+<p>注意：在传送完成之后，SI和DI(或者ESI和EDI)会增加或者减小。<br>当DF=0 时，表示正向传送，传送之后SI和DI(或者ESI和EDI)的值会增加；<br>当DF=1 时，表示反向传送，传送之后SI和DI(或者ESI和EDI)的值会减小；</p>
+<p>他们的区别是：<br>MOVSB:传送一个字节，之后SI和DI(或者ESI和EDI)加/减1<br>MOVSW:传送一个字，之后SI和DI(或者ESI和EDI)加/减2<br>MOVSD:传送一个双字，之后SI和DI(或者ESI和EDI)加/减4</p>
+<p>单纯的movsb/ movsw/ movsd只能执行一次，如果希望处理器自动地反复执行，可以加上指令前缀rep;在寄存器CX（16位模式）或者ECX（32位模式）中设置传送的次数。当CX/ECX不等于0时，则执行movsb/ movsw/ movsd,执行后，CX/ECX的值减一，直到减为0为止。</p>
+<p><a href="https://blog.csdn.net/longintchar/article/details/50949923" target="_blank" rel="noopener">原文链接</a></p>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>REP是用来控制传送的串的长度，这个寄存器就是CX，指令每次执行前都会判断CX的值是否为0（为0结束重复，不为0，CX的值减1），以此来设定重复执行的次数。因此设置好CX的值之后就可以用<a href="https://www.baidu.com/s?wd=REP&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao" target="_blank" rel="noopener">REP</a> <a href="https://www.baidu.com/s?wd=MOVSB&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao" target="_blank" rel="noopener">MOVSB</a>了。 </p>
+<h2 id="6-内部中断"><a href="#6-内部中断" class="headerlink" title="6.内部中断"></a>6.内部中断</h2><h3 id="中断向量表"><a href="#中断向量表" class="headerlink" title="中断向量表"></a>中断向量表</h3><p>中断向量表在内存中保存，有256个中断源对应的中断处理程序的入口地址。</p>
+<p>对于8086PC机，中断向量表指定放在内存地址0处。从内存0000:0000到0000:03FF的1024个单元中存放着中断向量表。</p>
+<h3 id="中断过程"><a href="#中断过程" class="headerlink" title="中断过程"></a>中断过程</h3><p>用中断类型码找到中断向量，并用它设置CS和IP，这个工作是由CPU的硬件自动完成的。</p>
+<p>CPU 硬件完成这个工作的过程被称为中断过程。</p>
+<p>（1）取得中断类型码N；</p>
+<p>（2） pushf</p>
+<p>（3） TF = 0，IF = 0 （关中断）</p>
+<p>（4） push CS</p>
+<p>（5） push IP</p>
+<p>（6）(IP) = (N * <em>4)，(CS) = (N</em> * 4+2)</p>
+<h3 id="中断处理程序"><a href="#中断处理程序" class="headerlink" title="中断处理程序"></a>中断处理程序</h3><p>（1）保存用到的寄存器。</p>
+<p>（2）处理中断。</p>
+<p>（3）恢复用到的寄存器。</p>
+<p>（4）用 iret 指令返回。</p>
+<p>iret指令的功能用汇编语法描述为：</p>
+<p>   pop IP</p>
+<p>   pop CS</p>
+<p>   popf  </p>
+<h3 id="编程处理N号中断"><a href="#编程处理N号中断" class="headerlink" title="编程处理N号中断"></a>编程处理N号中断</h3><p>中断随时都可能发生，而内存并不满足使得所有256个中断处理程序，但实际上，所以在中断向量表中，有许多单元是空的。中断向量表是PC系统中最重要的内存区，只用来存放中断处理程序的入口地址，DOS 系统和其他应用程序都不会随便使用这段空间。</p>
+<p><strong>我们可以利用中断向量表中的空闲单元来存放我们的程序。</strong></p>
+<p>一般情况下：</p>
+<p>  从0000 :0200至0000 : 02FF的256个字节的空间所对应的中断向量表项都是空的，操作系统和其他应用程序都不占用。</p>
+<p>所以我们可以把256B之内的中断处理程序传送到内存200处。</p>
+<p>  (1）编写可以显示“overflow！”的中断处理程序：do0；</p>
+<p>（2）将do0送入内存0000:0200处；</p>
+<p>（3）将do0的入口地址0000:0200存储在中断向量表0号表项中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">assume cs:code</span><br><span class="line">code segment</span><br><span class="line">start:</span><br><span class="line">          mov ax,cs</span><br><span class="line">          mov ds,ax</span><br><span class="line">          mov si,offset do0;设置ds:si指向源地址</span><br><span class="line">          mov ax,0</span><br><span class="line">          mov es,ax</span><br><span class="line">          mov di,200h       ;设置es:di指向目的地址</span><br><span class="line">          mov cx,offset do0end-offset do0;设置cx为传输长度</span><br><span class="line">          cld                     ;设置传输方向为正</span><br><span class="line">          rep movsb</span><br><span class="line">          ;设置中断向量表 </span><br><span class="line">         mov ax,0</span><br><span class="line">         mov es,ax</span><br><span class="line">         mov word ptr es:[0*4],200h</span><br><span class="line">         mov word ptr es:[0*4+2],0</span><br><span class="line"></span><br><span class="line">          mov ax,4c00h</span><br><span class="line">          int 21h</span><br><span class="line">do0:;设置ds:si指向字符串    </span><br><span class="line">        jmp do0start</span><br><span class="line">        db &#39;Overflow!&#39;;之所以把字符串写在这里，是为了避免内存覆盖</span><br><span class="line">do0start:</span><br><span class="line">        mov ax,0b800h</span><br><span class="line">        mov es,ax</span><br><span class="line">        mov di,12*160+36*2;设置es:di指向显存空间的中间位置</span><br><span class="line">        mov cx,9                 ;设置cx为字符串长度</span><br><span class="line">        mov si,202h</span><br><span class="line"></span><br><span class="line">    s: mov al,cs:[si]</span><br><span class="line">        mov es:[di],al</span><br><span class="line">        inc si</span><br><span class="line">        add di,2</span><br><span class="line">        loop s</span><br><span class="line">        mov ax,4c00h</span><br><span class="line">        int 21h</span><br><span class="line">do0end:nop</span><br><span class="line"></span><br><span class="line">code ends</span><br><span class="line">end start</span><br></pre></td></tr></table></figure>
+
+<p>注意：     “overflow！”在程序的data段中。程序执行完成后返回，它所占用的内存空间被系统释放，而在其中存放的“overflow！”也将很可能被别的信息覆盖。</p>
+<p>因为 do0 程序随时可能被执行，而它要用到字符串“overflow”，所以该字符串也应该存放在一段不会被覆盖的空间中。因为在do0程序开始处的“overflow!”不是可以执行的代码，所以在“overflow!”之前加上一条jmp 指令，转移到正式的do0 程序。当除法溢出发生时，CPU 执行0:200 处的jmp 指令，跳过后面的字符串，转到正式的do0 程序执行。</p>
+<h3 id="dos中断调用"><a href="#dos中断调用" class="headerlink" title="dos中断调用"></a>dos中断调用</h3><p>一个供程序员调用的中断例程中往往包括多个子程序，中断例程内部用传递进来的参数来决定执行哪个子程序。</p>
+<p>BIOS 和提供的中断例程，都用来ah传递内部子程序的编号。</p>
+<p>内存地址空间中，B8000h~BFFFFh共 32K的空间，为80*25 彩色字符模式的显示缓冲区。</p>
+<p>一屏的内容在显示缓冲区中共占4000个字节。显示缓冲区分为8页，每页4K（≈4000），显示器可以显示任意一页的内容。一般情况下，显示第 0 页的内容。也就是说，通常情况下，B8000~B8F9F中的4000个字节的内容将出现在显示器上。</p>
+<p><strong>设置光标位置功能</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">    mov ah,2</span><br><span class="line"></span><br><span class="line">​    mov bh,0</span><br><span class="line"></span><br><span class="line">​    mov dh,5</span><br><span class="line"></span><br><span class="line">​    mov dl,12</span><br><span class="line"></span><br><span class="line">​    int 10h</span><br></pre></td></tr></table></figure>
+
+<p><strong>在光标位置显示字符功能</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    mov ah,9 ;置光标</span><br><span class="line"></span><br><span class="line">​    mov al,’a’ ;字符</span><br><span class="line"></span><br><span class="line">​    mov bl,7 ;颜色属性</span><br><span class="line"></span><br><span class="line">​    mov bh,0 ;第0页</span><br><span class="line"></span><br><span class="line">​    mov cx,3 ;字符重复个数</span><br><span class="line"></span><br><span class="line">​    int 10h</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/bh.png" class title="bh的属性值">
+
+
+
+<p><strong>在光标位置显示字符串</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ds:dx          指向字符串  ;要显示的字符串需用“$”作为结束符</span><br><span class="line"></span><br><span class="line">mov ah ,9       ;功能号9，表示在光标位置显示字符串</span><br><span class="line"></span><br><span class="line">int 21h</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="外部中断"><a href="#外部中断" class="headerlink" title="外部中断"></a>外部中断</h2><p>CPU可以直接读写三个地方，寄存器，内存，以及外设的端口。</p>
+<p>通过<strong>in和out</strong>从端口读取数据和往端口写入数据。</p>
+<p><strong>注意：在in和out 指令中，只能使用 ax 或al 来存放从端口中读入的数据或要发送到端口中的数据。访问8 位端口时用 al ，访问16 位端口时用ax 。</strong></p>
+<h3 id="端口读写的过程："><a href="#端口读写的过程：" class="headerlink" title="端口读写的过程："></a>端口读写的过程：</h3><p>访问端口：</p>
+<p>in al,60h;从60h号端口读入一个字节</p>
+<p>执行时与总线相关的操作：</p>
+<p> ① CPU通过地址线将地址信息60h发出；</p>
+<p> ② CPU通过控制线发出端口读命令，选中端口所在的芯片，并通知它，将要从中读取数据；</p>
+<p> ③ 端口所在的芯片将60h端口中的数据通过数据线送入CPU。</p>
+<p><strong>对0～255以内的端口进行读写：</strong></p>
+<p>  in al,20h ;从20h端口读入一个字节</p>
+<p>  out 20h,al  ;往20h端口写入一个字节</p>
+<p><strong>对256～65535的端口进行读写时，端口号放在dx中：</strong></p>
+<p>  mov dx,3f8h  ;将端口号3f8送入dx</p>
+<p>  in al,dx  ;从3f8h端口读入一个字节</p>
+<p>  out dx,al  ;向3f8h端口写入一个字节</p>
+<h2 id="shl-shr"><a href="#shl-shr" class="headerlink" title="shl ,shr"></a>shl ,shr</h2><p>shl逻辑左移指令，功能为：</p>
+<p>（1）将一个寄存器或内存单元中的数据向左移位；</p>
+<p>（2）将最后移出的一位写入CF中；</p>
+<p>（3）最低位用0补充。</p>
+<p><strong>如果移动位数大于1时，必须将移动位数放在cl中。</strong></p>
+<p>  比如，指令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov al,01010001b</span><br><span class="line"></span><br><span class="line">mov cl,3</span><br><span class="line"></span><br><span class="line">shl al,cl</span><br></pre></td></tr></table></figure>
+
+<p>shr逻辑右移指令，它和shl所进行的操作刚好相反：</p>
+<p>（1）将一个寄存器或内存单元中的数据向右移位；</p>
+<p>（2）将最后移出的一位写入CF中；</p>
+<p>（3）最高位用0补充。</p>
+<h3 id="CMOS-RAM芯片"><a href="#CMOS-RAM芯片" class="headerlink" title="CMOS RAM芯片"></a>CMOS RAM芯片</h3><h3 id="PC机中有一个CMOS-RAM芯片，其有如下特征："><a href="#PC机中有一个CMOS-RAM芯片，其有如下特征：" class="headerlink" title="PC机中有一个CMOS RAM芯片，其有如下特征："></a>PC机中有一个CMOS RAM芯片，其有如下特征：</h3><p>（1）包含一个实时钟和一个有128个存储单元的RAM存储器。</p>
+<p>（2）该芯片靠电池供电。</p>
+<p>  所以，关机后其内部的实时钟仍可正常工作， RAM 中的信息不丢失。</p>
+<p>（3） 128 个字节的 RAM 中，内部实时钟占用 0～0dh单元来保存时间信息，其余大部分分单元用于保 存系统配置信息，供系统启动时BIOS程序读取。</p>
+<p>  BIOS也提供了相关的程序，使我们可以在开机的时候配置CMOS RAM 中的系统信息。</p>
+<p>（4）该芯片内部有两个端口，端口地址为70h和71h。</p>
+<p>  CPU 通过这两个端口读写CMOS RAM。</p>
+<p>（5）70h为地址端口，存放要访问的CMOS RAM单元的地址；</p>
+<p>  71h为数据端口，存放从选定的CMOS RAM 单元中读取的数据，或要写入到其中的数据。</p>
+<h3 id="可见，CPU对CMOS-RAM的读写分两步进行。"><a href="#可见，CPU对CMOS-RAM的读写分两步进行。" class="headerlink" title="可见，CPU对CMOS RAM的读写分两步进行。"></a>可见，CPU对CMOS RAM的读写分两步进行。</h3><p>比如：读CMOS RAM的2号单元：</p>
+<p>n1、将2送入端口70h</p>
+<p>n2、从71h读出2号单元的内容</p>
+<h3 id="在CMOS-RAM中，存放着当前时间："><a href="#在CMOS-RAM中，存放着当前时间：" class="headerlink" title="在CMOS RAM中，存放着当前时间："></a>在CMOS RAM中，存放着当前时间：</h3><p>   秒：00H</p>
+<p>   分：02H</p>
+<p>   时：04H</p>
+<p>   日：07H</p>
+<p>   月：08H</p>
+<p>   年：09H   （2018高位的20没有存储）</p>
+<p>这6个信息的长度长度都为1个字节。</p>
+<p>这些数据以BCD码的方式存放，BCD 码值＝十进制数码值，则BCD码值＋30h＝十进制数对应的ASCII码。  </p>
+<h4 id="编程：在屏幕中间显示当前的月份。"><a href="#编程：在屏幕中间显示当前的月份。" class="headerlink" title="编程：在屏幕中间显示当前的月份。"></a>编程：在屏幕中间显示当前的月份。</h4><p>  分析：这个程序主要做两部分工作：</p>
+<p>（1）从CMOS RAM的8号单元读出当前月份的BCD码；</p>
+<p>  要读取 CMOS RAM的信息，我们首先要向地址端口70h写入要访问的单元的地址：   </p>
+<p>   mov al,8 </p>
+<p>   out 70h,al</p>
+<p>  然后从数据端口71h中取得指定单元中的数据：</p>
+<p>   in al,71h</p>
+<p>从CMOS RAM的8号单元读出的一个字节中，包含了用两个 BCD 码表示的两位十进制数，高4位的 BCD码表示十位，低 4位的 BCD码表示个位。</p>
+<p>（一）将从CMOS RAM的8号单元中读取的一个字节，分为两个表示BCD码值的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mov ah,al ;al中为从CMOS RAM的 8号单元读出的数据</span><br><span class="line"></span><br><span class="line">mov cl,4</span><br><span class="line"></span><br><span class="line">shr ah,cl  ;ah中为月份的十位数码值 </span><br><span class="line"></span><br><span class="line">and al,00001111b ;ah中为月份的个位数码值</span><br></pre></td></tr></table></figure>
+
+<p>（二）显示(ah)+30h 和 (al)+30 对应的ASCII码字符。</p>
+<p>（2）将用BCD码表示的月份以十进制的形式显示到屏幕上。</p>
 
         </div>
 
