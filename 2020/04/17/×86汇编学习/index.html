@@ -204,7 +204,21 @@
         </header>
 
         <div class="post-content">
-            <ol>
+            <h1 id="老是忘记！！显存，高位字节存属性。低位存ASCII"><a href="#老是忘记！！显存，高位字节存属性。低位存ASCII" class="headerlink" title="老是忘记！！显存，高位字节存属性。低位存ASCII"></a>老是忘记！！显存，高位字节存属性。低位存ASCII</h1><h2 id="80x86寻址方式"><a href="#80x86寻址方式" class="headerlink" title="80x86寻址方式"></a>80x86寻址方式</h2><ol>
+<li><p><strong>立即寻址方式</strong> 形式：mov ax,3829H。这种方式中，操作数直接放在指令中，跟在操作码之后，一般用于直接赋值；</p>
+</li>
+<li><p><strong>寄存器寻址方式</strong> 形式：mov ax,bx。这种方式实际上是寄存器赋值，将一个寄存器中的值存入目的寄存器；</p>
+</li>
+<li><p><strong>直接寻址方式</strong> 形式：mov ax,[2000H]。这种方式中，源操作数是一个内存地址，直接在指令中给出，功能是将该地址指向的内存单元内容放入目的寄存器；</p>
+</li>
+<li><p><strong>寄存器间接寻址方式</strong>形式：mov ax,[bx]。功能和上一种类似，只不过偏移量不是直接给出，而是放在寄存器bx里；</p>
+</li>
+<li><p><strong>寄存器相对寻址方式</strong>形式：mov ax,COUNT[si] 或 mov ax,[COUNT+si]。这又称为直接变址寻址方式COUNT是一个符号地址，可以在数据段定义。操作数的物理地址为基址寄存器或变址寄存器内容＋偏移量＋段地址。这种情况下，COUNT指定了一个固定的偏移量，可以看作数组的首地址，而si是源变址寄存器（也可以换成bx基址寄存器），可以看作数组元素下标。用这种方式可以很容易地利用修改基址或变址寄存器的内容来取得表格中某一项内容；</p>
+</li>
+<li><p><strong>基址变址寻址方式</strong>形式：mov ax,[bx][di] 或 mov ax,[bx+di]。操作数的有效地址是一个基址寄存器和一个变址寄存器内容之和。di是目的变址寄存器，假如(DS)=2100H，(BX)=0158H，(DI)=10A5H，则有效地址EA＝0158H+10A5H=11FDH，物理地址则还要加一个21000H，为221FDH；</p>
+</li>
+<li><p><strong>相对基址变址寻址方式</strong>形式：mov ax,MASK[bx][si]。其中MASK直接指定，为位移量，BX是基址，SI为源变址。操作数有效地址为一个基址寄存器与一个变址寄存器的内容和指令中指定的位移量之和。这种方式常用于对二维数组寻址，比如存储器中存放着由多个记录组成的文件，则偏移量可指向文件之首，基址指向某个记录，变址寄存器则指向该记录的一个元素。</p>
+</li>
 <li><p>8086/8088的<a href="https://www.baidu.com/s?wd=汇编语言&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao" target="_blank" rel="noopener">汇编语言</a>里面,以字母开头的16进制数，前面必须加“0”。如0a2h,0fdh,0bcdeh等。 主要是汇编语言编译器的设计者需要用户按这个规则编程,否则它设计的编译器不知道你写的是什么。</p>
 <p>因为标号不能以0～9的数字开头,但可以以字母开头，<strong>导致无法识别数值与标记</strong>。</p>
 </li>
@@ -274,6 +288,11 @@
 <p>BIOS 和提供的中断例程，都用来ah传递内部子程序的编号。</p>
 <p>内存地址空间中，B8000h~BFFFFh共 32K的空间，为80*25 彩色字符模式的显示缓冲区。</p>
 <p>一屏的内容在显示缓冲区中共占4000个字节。显示缓冲区分为8页，每页4K（≈4000），显示器可以显示任意一页的内容。一般情况下，显示第 0 页的内容。也就是说，通常情况下，B8000~B8F9F中的4000个字节的内容将出现在显示器上。</p>
+<p>bh的属性</p>
+<img src="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/bh.png" class>
+
+
+
 <p><strong>设置光标位置功能</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">    mov ah,2</span><br><span class="line"></span><br><span class="line">​    mov bh,0</span><br><span class="line"></span><br><span class="line">​    mov dh,5</span><br><span class="line"></span><br><span class="line">​    mov dl,12</span><br><span class="line"></span><br><span class="line">​    int 10h</span><br></pre></td></tr></table></figure>
 
@@ -350,6 +369,225 @@
 
 <p>（二）显示(ah)+30h 和 (al)+30 对应的ASCII码字符。</p>
 <p>（2）将用BCD码表示的月份以十进制的形式显示到屏幕上。</p>
+<h3 id="变量、标号的三种属性"><a href="#变量、标号的三种属性" class="headerlink" title="变量、标号的三种属性"></a>变量、标号的三种属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">源程序中的变量和标号都有三种属性：段、偏移及类型。变量在除代码段以外的其他段中定义，段地址存放在段寄存器中，偏移地址存放在基址或变址寄存器中，变量的类型可以是BYTE（字节）、WORD（字）、DWORD（双字）等；标号指示指令的地址，它的段地址总在CS中，偏移地址在IP中，标号的类型可以是NEAR（近）或FAR（远）。</span><br></pre></td></tr></table></figure>
+
+<p> ROL ( ROtate Left) 循环左移指令</p>
+<p>ROL OPR , CNT //Byte/Word</p>
+<p>每次移位时,最高位移出并同时移到CF和最低位D0.</p>
+<h3 id="8088-8086"><a href="#8088-8086" class="headerlink" title="8088 8086"></a>8088 8086</h3><p>1、8088：8088只有8条数据信号引线。</p>
+<p>2、8086：8086有16条数据信号引线。</p>
+<p> 8086和8088在芯片内部均采用16位数据传输，所以都称为16位微处理器，因此其直接寻址能力为2^16=65536个内存单元 </p>
+<p><strong>地址总线的宽度决定了CPU的寻址能力；</strong></p>
+<p><strong>数据总线的宽度决定了CPU与其它器件进行数据传送时的一次数据传送量；</strong></p>
+<p><strong>控制总线宽度决定了CPU对系统中其它器件的控制能力。</strong></p>
+<p>控制总线宽度决定了CPU对系统中其它器件的控制能力。**</p>
+<h3 id="各种jmp"><a href="#各种jmp" class="headerlink" title="各种jmp"></a>各种jmp</h3><ol>
+<li><p>jmp short </p>
+<p>实际上，指令“jmp short 标号”的功能为(IP)=(IP)+8位位移。</p>
+<p>（1）8位位移=“标号”处的地址-jmp指令后的第一个字节的地址；</p>
+<p>（2）short指明此处的位移为8位位移；</p>
+<p>（3）8位位移的范围为-128~127，用补码表示</p>
+<p>（4）8位位移由编译程序在编译时算出。</p>
+</li>
+<li><p>jmp near ptr..</p>
+</li>
+</ol>
+<p>​        指令“jmp near ptr 标号”的说明：</p>
+<p>（1）16位位移=“标号”处的地址-jmp指令后的第一个字节的地址；</p>
+<p>（2）near ptr指明此处的位移为16位位移，进行的是段内近转移；</p>
+<p>（3）16位位移的范围为 -32769~32767，用补码表示；</p>
+<p> （4）16位位移由编译程序在编译时算出  </p>
+<ol start="3">
+<li><p>jmp far ptr…</p>
+<p>指令 “jmp far ptr 标号” 功能如下：</p>
+<p>(CS)=标号所在段的段地址；</p>
+<p>(IP)=标号所在段中的偏移地址。</p>
+<p>far ptr指明了指令用标号的段地址和偏移地址修改CS和IP。</p>
+</li>
+<li><p>jmp ax</p>
+<p>指令格式：jmp 16位寄存器</p>
+<p>功能：IP =（16位寄存器）</p>
+</li>
+<li><p>jmp </p>
+<p>（1） jmp word ptr 内存单元地址（段内转移）</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mov ax,0123H</span><br><span class="line"></span><br><span class="line">mov ds:[0],ax</span><br><span class="line"></span><br><span class="line">jmp word ptr ds:[0]</span><br><span class="line"></span><br><span class="line">执行后，(IP)&#x3D;0123H</span><br><span class="line"></span><br><span class="line">等价于：</span><br><span class="line"></span><br><span class="line">mov ax,0123H</span><br><span class="line"></span><br><span class="line">mov [bx],ax</span><br><span class="line"></span><br><span class="line">jmp word ptr [bx]</span><br><span class="line"></span><br><span class="line">执行后，(IP)&#x3D;0123H</span><br></pre></td></tr></table></figure>
+
+<p>（2） jmp dword ptr 内存单元地址（段间转移）</p>
+<p>  功能：从内存单元地址处开始存放着两个字，高地址处的字是转移的目的段地址，低地址处是转移的目的偏移地址。</p>
+<p> (CS)=(内存单元地址+2)</p>
+<p> (IP)=(内存单元地址)</p>
+<p>  内存单元地址可用寻址方式的任一格式给出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mov ax,0123H</span><br><span class="line">mov ds:[0],ax</span><br><span class="line">mov word ptr ds:[2],0</span><br><span class="line">jmp dword ptr ds:[0]</span><br><span class="line">执行后，</span><br><span class="line">(CS)&#x3D;0</span><br><span class="line">(IP)&#x3D;0123H</span><br><span class="line">CS:IP指向0000：0123。</span><br><span class="line">或者</span><br><span class="line">mov ax,0123H</span><br><span class="line">mov [bx],ax</span><br><span class="line">mov word ptr [bx+2],0</span><br><span class="line">jmp dword ptr [bx]</span><br><span class="line">执行后，</span><br><span class="line">(CS)&#x3D;0</span><br><span class="line">(IP)&#x3D;0123H</span><br><span class="line">CS:IP指向0000：0123。</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="6">
+<li><p>jcxz</p>
+<p>jcxz指令为有条件转移指令，<strong>所有的有条件转移指令都是短转移</strong>，在对应的机器码中包含转移的位移，而不是目的地址。对IP的修改范围都为-128~127。</p>
+<p>“jcxz 标号”的功能相当于：</p>
+<p>  if((cx)==0)jmp short 标号；</p>
+</li>
+<li><p>loop</p>
+<p>loop指令为循环指令，<strong>所有的循环指令都是短转移</strong>，在对应的机器码中包含转移的位移，而不是目的地址。对IP的修改范围都为-128~127。</p>
+<p>指令格式：loop 标号</p>
+<p>  ((cx))=(cx)-1，如果(cx)≠0，转移到标号处执行。</p>
+</li>
+</ol>
+<p>前面我们讲到：</p>
+<p>   jmp short 标号</p>
+<p>   jmp near ptr 标号</p>
+<p>   jcxz 标号</p>
+<p>   loop 标号</p>
+<p>  等几种汇编指令，它们<strong>对 IP的修改是根据转移目的地址和转移起始地址之间的位移来进行的。在它们对应的机器码中不包含转移的目的地址，而包含目的地址的位移。</strong></p>
+<p><strong>这样设计，方便了程序段在内存中的浮动装配。</strong></p>
+<h3 id="ret-retf"><a href="#ret-retf" class="headerlink" title="ret retf"></a>ret retf</h3><p>CPU执行ret指令时，进行下面两步操作：</p>
+<p>（1）(IP)=((ss)*16+(sp))</p>
+<p>（2）(sp)=(sp)+2</p>
+<p>pop ip</p>
+<p>CPU执行retf指令时，进行下面两步操作：</p>
+<p>（1）(IP)=((ss)*16+(sp))</p>
+<p>（2）(sp)=(sp)+2</p>
+<p>（3）(CS)=((ss)*16+(sp))</p>
+<p>（4）(sp)=(sp)+2</p>
+<p>pop ip</p>
+<p>pop cs</p>
+<h3 id="call"><a href="#call" class="headerlink" title="call"></a>call</h3><p>CPU执行call指令，进行两步操作：</p>
+<p>（1）将当前的 IP 或 CS和IP 压入栈中；</p>
+<p>（2）转移。</p>
+<p><strong>call 指令不能实现短转移</strong>，除此之外，指令实现转移的方法和 指令的原理相同</p>
+<ol>
+<li><p>call 标号</p>
+<p>16位位移=“标号”处的地址－call指令后的第一个字节的地址；</p>
+<p>16位位移的范围为 -32768~32767，用补码表示；</p>
+<p>16位位移由编译程序在编译时算出。</p>
+</li>
+<li><p>call far ptr</p>
+<p>CPU 执行指令 “call far ptr 标号” 时，相当于进行：</p>
+</li>
+</ol>
+<p>​    push CS</p>
+<p>​     push IP</p>
+<p>​     jmp far ptr 标号</p>
+<p>​    (sp) = (sp) – 2</p>
+<p>​    ((ss) ×16+(sp)) = (CS)</p>
+<p>​    (sp) = (sp) – 2</p>
+<p>​    ((ss) ×16+(sp)) = (IP)</p>
+<ol start="3">
+<li><p>call 16为寄存器</p>
+<p>指令格式：call 16位寄存器</p>
+<p>汇编语法解释此种格式的 call 指令，CPU执行call 16位reg时，相当于进行：</p>
+<p>​     push IP </p>
+<p>​      jmp 16位寄存器</p>
+</li>
+<li><p>转移地址在内存中的call指令有两种格式：</p>
+<p>(1) call word ptr 内存单元地址</p>
+<p> mov sp,10h</p>
+<p> mov ax,0123h</p>
+<p> mov ds:[0],ax</p>
+<p> call word ptr ds:[0]</p>
+<p>执行后，(IP)=0123H，(sp)=<strong>0EH</strong></p>
+<p> (2) 内存单元地址</p>
+<p>mov sp,10h</p>
+<p>mov ax,0123h</p>
+<p>mov ds:[0],ax</p>
+<p>mov word ptr ds:[2],0</p>
+<p>call dword ptr ds:[0]</p>
+<p>执行后，(CS)=0，(IP)=0123H，(sp)=<strong>0CH</strong></p>
+</li>
+</ol>
+<h2 id="标志寄存器"><a href="#标志寄存器" class="headerlink" title="标志寄存器"></a>标志寄存器</h2><p>8086CPU的标志寄存器有16位，其中存储的信息通常被称为程序状态字（PSW）。</p>
+<p>flag按位起作用。</p>
+<img src="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/flag.png" class>
+
+
+
+
+
+<ol>
+<li><p>flag的第6位是<strong>ZF</strong>，零标志位。</p>
+<p>它记录相关指令执行后，</p>
+</li>
+</ol>
+<p>结果为0 ，ZF = 1</p>
+<p>  <strong>有的指令的执行对标志寄存器没有影响，比如：mov、push、pop等，它们大都是传送指令。</strong></p>
+<ol start="2">
+<li><p>flag的第2位是<strong>PF</strong>，奇偶标志位。</p>
+<p>它记录指令执行后，结果的所有二进制位中1的个数：奇校验位！！！！！！</p>
+</li>
+</ol>
+<ol start="3">
+<li><p>flag的第7位是<strong>SF</strong>，符号标志位。<strong>（有符号数运算）</strong></p>
+<p>  它记录指令执行后，</p>
+<p>结果为负，SF = 1；</p>
+<p>结果为非负，SF = 0。</p>
+</li>
+</ol>
+<ol start="4">
+<li><p>flag的第0位是<strong>CF</strong>，进位标志位。</p>
+<p>一般情况下，在进行<strong>无符号数运算</strong>的时候，它记录了运算结果的最高有效位向更高位的进位值，或从更高位的借位值。</p>
+</li>
+</ol>
+<ol start="5">
+<li><p><strong>OF</strong>记录了有符号数运算的结果是否发生了溢出。</p>
+<p>如果发生溢出，OF=1，</p>
+</li>
+<li><p>flag的第10位是DF，方向标志位。</p>
+<p>在串处理指令中，控制每次操作后si，di的增减。</p>
+<p>DF = 0：每次操作后si，di递增；</p>
+<p>DF = 1：每次操作后si，di递减。</p>
+</li>
+</ol>
+<p>movsb 的功能是将 ds:si 指向的内存单元中的字节送入 es:di中，然后根据标志寄存器DF位的值，将 si和di递增或递减。</p>
+<p>movsw（以字为单位传送）</p>
+<p> 将 ds:si指向的内存字单元中word送入es:di中，然后根据标志寄存器DF位的值，将si和di递增2或递减2。</p>
+<p>rep movsb<br> 用汇编语法来描述rep movsb的功能就是：<br>  s : movsb<br>    loop s</p>
+<p>8086CPU提供下而两条指令对DF位进行设置：</p>
+<p>cld指令：将标志寄存器的DF位置0</p>
+<p>std指令：将标志寄存器的DF位置1</p>
+<img src="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/j.png" class>
+
+
+
+<h1 id="无符号数比较大小用JA-JB…"><a href="#无符号数比较大小用JA-JB…" class="headerlink" title="无符号数比较大小用JA,JB…"></a>无符号数比较大小用JA,JB…</h1><h1 id="有符号数比较大小用JG-JL…"><a href="#有符号数比较大小用JG-JL…" class="headerlink" title="有符号数比较大小用JG,JL…"></a>有符号数比较大小用JG,JL…</h1><p>记忆方法：无符号数有JB。</p>
+<h2 id="adc"><a href="#adc" class="headerlink" title="adc"></a>adc</h2><p>+CF</p>
+<p>编程计算1EF000H+201000H，结果放在ax（高16位）和bx（低16位）中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov ax,001EH     </span><br><span class="line">mov bx,0F000H    </span><br><span class="line">add bx,1000H      </span><br><span class="line">adc ax,0020H</span><br></pre></td></tr></table></figure>
+
+<h2 id="sbb"><a href="#sbb" class="headerlink" title="sbb"></a>sbb</h2><p>类似</p>
+<h2 id="cmp不影响寄存器"><a href="#cmp不影响寄存器" class="headerlink" title="cmp不影响寄存器"></a>cmp不影响寄存器</h2><img src="/2020/04/17/%C3%9786%E6%B1%87%E7%BC%96%E5%AD%A6%E4%B9%A0/cmp.png" class>
+
+
+
+
+
+<p>如果没有溢出发生的话，那么，实际结果的正负和逻辑上真正结果的正负就一致了。</p>
+<p>  所以，我们应该在考察SF（得知实际结果的正负）的同时考察OF（得知有没有溢出），就可以得知逻辑上真正结果的正负，同时就可以知道比较的结果。</p>
+<ol>
+<li><p>SF=1，OF=0</p>
+<p> OF=0，说明没有溢出，逻辑上真正结果的正负=实际结果的正负；</p>
+<p>  因SF=1，实际结果为负，所以逻辑上真正的结果为负，所以(ah)&lt;(bh)。 </p>
+</li>
+<li><p>如果SF=1，而OF=1</p>
+<p>  OF=1 ，说明有溢出，逻辑上真正结果的正负≠实际结果的正负；</p>
+<p>  因 SF=1 ，实际结果为负，实际结果为负，而又有溢出，这说明是由于溢出导致了实际结果为负，</p>
+<p> 简单分析一下，就可以看出，如果因为溢出导致了实际结果为负，那么逻辑上真正的结果必然为正。这样，SF=1，OF = 1 ，说明了(ah)&gt;(bh)。 </p>
+</li>
+<li><p>（3）如果SF=0，而OF=1</p>
+<p>  OF=1 ，说明有溢出，逻辑上真正结果的正负≠实际结果的正负；</p>
+<p>  因SF=0，实际结果非负，而OF=1说明有溢出，则结果非 0 ，所以，实际结果为正。实际结果为正，而又有溢出，这说明是由于溢出导致了实际结果非负，</p>
+<p> 简单分析一下，就可以看出，如果因为溢出导致了实际结果为正，那么逻辑上真正的结果必然为负。这样，SF=0，OF = 1 ，说明了(ah)&lt;(bh)。 </p>
+</li>
+<li><p>如果SF=0，而OF=0</p>
+<p>  OF=0，说明没有溢出，逻辑上真正结果的正负=实际结果的正负；</p>
+<p>  因SF=0，实际结果非负，所以逻辑上真正的结果必然非负。所以(ah)≥(bh)。 </p>
+</li>
+</ol>
+<h2 id="BIOS和DOS中断例程的安装过程"><a href="#BIOS和DOS中断例程的安装过程" class="headerlink" title="BIOS和DOS中断例程的安装过程"></a>BIOS和DOS中断例程的安装过程</h2><p>（1） 开机后，CPU 一加电，初始化(CS)=0FFFFH，(IP)=0，自动从FFFF:0单元开始执行程序。FFFF:0处有一条转跳指令，CPU执行该指令后，转去执行BIOS中的硬件系统检测和初始化程序。</p>
+<p>（2）初始化程序将建立BIOS 所支持的中断向量，即将BIOS提供的中断例程的入口地址登记在中断向量表中。</p>
+<p>（3） 硬件系统检测和初始化完成后，调用int 19h进行操作系统的引导。从此将计算机交由操作系统控制。</p>
+<p>（4）DOS 启动后，除完成其它工作外，还将它所提供的中断例程装入内存，并建立相应的中断向量。</p>
 
         </div>
 
